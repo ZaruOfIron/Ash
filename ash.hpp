@@ -15,7 +15,7 @@ private:
 public:
 	Ash();
 
-
+	void update(const UserUpdateMessage& msg);
 };
 
 
