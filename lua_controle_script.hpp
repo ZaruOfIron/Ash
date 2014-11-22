@@ -5,6 +5,8 @@
 #include <memory>
 #include <string>
 
+struct lua_State;
+class Ash;
 class ControleWindow;
 
 class LuaControleScript : public ControleScript
