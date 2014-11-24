@@ -18,7 +18,7 @@ private:
 	void setClientSize(int width, int height);
 
 public:
-	ControleWindow();
+	ControleWindow(LuaControleScript *controler);
 
 	void OnCreate();
 	void OnInitialUpdate();
