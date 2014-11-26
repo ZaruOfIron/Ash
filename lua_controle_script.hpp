@@ -16,13 +16,14 @@ private:
 	std::unique_ptr<ControleWindow> window_;
 	std::string filename_;
 	Ash& ash_;
-	static LuaControleScript *thisPtr_;
 
 public:
 	LuaControleScript(Ash& ash, const std::string& filename);
 	
 	void initialize();
 	void onCommand(int index, int id);
+
+	static int luaUser(lua_State *L);
 };
 
 #endif
