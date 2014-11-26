@@ -1,8 +1,10 @@
 #include "lua_controle_script.hpp"
 #include <cassert>
 
+LuaControleScript *LuaControleScript::thisPtr_ = nullptr;
+
 LuaControleScript::LuaControleScript(Ash& ash, const std::string& filename)
-	: lua_(luaL_newstate(), lua_close), filenaem_(filename), ash_(ash)
+	: lua_(luaL_newstate(), lua_close), filename_(filename), ash_(ash)
 {
 	// nullでなければ、他にインスタンスが存在する
 	assert(thisPtr_ == nullptr);
@@ -17,7 +19,7 @@ void LuaControleScript::initialize()
 {
 	auto L = lua_.get();
 
-	window_.reset(new ControleWindow(this));
+	//window_.reset(new ControleWindow(this));
 
 	// apiを設定
 	static const luaL_Reg ash[] = {
@@ -38,11 +40,7 @@ void LuaControleScript::initialize()
 	luaL_newlib(L, ash);
 	luaL_newlib(L, ash_config);
 	lua_setfield(L, -2, "config");
-	lua_pushnumber(L, reinterpret_cast<lua_Number>(this));
-	lua_setfield(L, -2, "_cppptr");
 	lua_setglobal(L, "ash");
-
-	std::cout << "this = " << reinterpret_cast<unsigned int>(this) << std::endl;
 
 	// initialize()を呼び出す
 	// 関数を積む
@@ -61,8 +59,8 @@ void LuaControleScript::onCommand(int index, int id)
 	// 関数を積む
 	lua_getglobal(L, "on_command");
 	// 引数を積む
-	lua_pushnumber(index);
-	lua_pushnumber(id);
+	lua_pushnumber(L, index);
+	lua_pushnumber(L, id);
 	// 呼び出す
 	// lua_pcall(L, 引数, 戻り値, ?)
 	if(lua_pcall(L, 2, 0, 0))	throw std::runtime_error(luaL_checkstring(L, -1));
@@ -70,18 +68,14 @@ void LuaControleScript::onCommand(int index, int id)
 
 int LuaControleScript::luaUser(lua_State *L)
 {
-	int index = lua_checknumber(L, -1);
-	lua_getglobal(L, "ash");
-	lua_getfield(L, -1, "_cppptr");
-	auto thisPtr = reinterpret_cast<LuaControleScript>(lua_checknumber(L, -1));
+	int index = luaL_checkint(L, -1);
 	lua_settop(L, 0);	// Clear the stack
-	std::cout << "_cppptr = " << static_cast<unsigned int>(thisPtr) << std::endl;
 
 	static const luaL_Reg ash_user[] = {
-		{ "correct", &LuaControleScript::luaCorrect },
-		{ "wrong", &LuaControleScript::luaWrong },
-		{ "score", &LuaControleScript::luaScore },
-		{ "add_info", &LuaControleScript::luaAddInfo },
+		//{ "correct", &LuaControleScript::luaCorrect },
+		//{ "wrong", &LuaControleScript::luaWrong },
+		//{ "score", &LuaControleScript::luaScore },
+		//{ "add_info", &LuaControleScript::luaAddInfo },
 		{ NULL, NULL }
 	};
 

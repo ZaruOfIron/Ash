@@ -13,9 +13,10 @@ class LuaControleScript : public ControleScript
 {
 private:
 	std::unique_ptr<lua_State, decltype(&lua_close)> lua_;
-	std::unique_ptr<ControleWindow> window_;
+	//std::unique_ptr<ControleWindow> window_;
 	std::string filename_;
 	Ash& ash_;
+	static LuaControleScript *thisPtr_;
 
 public:
 	LuaControleScript(Ash& ash, const std::string& filename);
