@@ -20,6 +20,7 @@ private:
 
 public:
 	LuaControleScript(Ash& ash, const std::string& filename);
+	~LuaControleScript();
 	
 	void initialize();
 	void onCommand(int index, int id);

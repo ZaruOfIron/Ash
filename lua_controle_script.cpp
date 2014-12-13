@@ -18,6 +18,11 @@ LuaControleScript::LuaControleScript(Ash& ash, const std::string& filename)
 		throw LuaCantLoadFileError(luaL_checkstring(L, -1));
 }
 
+LuaControleScript::~LuaControleScript()
+{
+	thisPtr_ = nullptr;
+}
+
 void LuaControleScript::initialize()
 {
 	auto L = lua_.get();
