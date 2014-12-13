@@ -22,4 +22,7 @@ void Ash::luaInitialize(int answer, int winner, const std::string& title, const 
 	users_.resize(answer, orgUser);
 }
 
+void Ash::luaUpdate(const UserUpdateMessage& msg)
+{
+}
 
