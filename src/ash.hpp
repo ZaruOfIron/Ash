@@ -13,9 +13,13 @@ private:
 	std::unique_ptr<ControleScript> controler_;
 
 public:
-	Ash(){};
+	Ash();
 
-	void update(const UserUpdateMessage& msg);
+	void setScript(const std::string& filename);
+	const User& getUser(int index);
+
+	void luaInitialize(int answer, int winner, const std::string& title, const std::string& subtitle, int quizId, const User& orgUser);
+	void luaUpdate(const UserUpdateMessage& msg);
 };
 
 
