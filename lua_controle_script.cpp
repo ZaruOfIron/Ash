@@ -42,6 +42,10 @@ void LuaControleScript::initialize()
 	lua_setfield(L, -2, "config");
 	lua_setglobal(L, "ash");
 
+	// グローバルの処理をまわす
+	luaL_loadfile(L, filename_.c_str());
+	if(lua_pcall(L, 0, 0, 0))	throw std::runtime_error(luaL_checkstring(L, -1));
+
 	// initialize()を呼び出す
 	// 関数を積む
 	lua_getglobal(L, "initialize");

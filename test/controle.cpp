@@ -1,4 +1,5 @@
 #include <boost/test/unit_test.hpp>
+#include "../ash.hpp"
 #include "../lua_controle_script.hpp"
 
 BOOST_AUTO_TEST_CASE( script1 )
