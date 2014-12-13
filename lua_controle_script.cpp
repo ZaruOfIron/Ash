@@ -9,13 +9,16 @@ LuaControleScript::LuaControleScript(Ash& ash, const std::string& filename)
 {
 	// nullでなければ、他にインスタンスが存在する
 	assert(thisPtr_ == nullptr);
-	thisPtr_ = this;
 
 	// Lua Scriptを初期化
 	auto L = lua_.get();
 	luaL_openlibs(L);
 	if(luaL_loadfile(L, filename_.c_str()) || lua_pcall(L, 0, 0, 0))
 		throw LuaCantLoadFileError(luaL_checkstring(L, -1));
+
+	// コンストラクタ内で例外が飛んだときのために
+	// 代入は一番最後
+	thisPtr_ = this;
 }
 
 LuaControleScript::~LuaControleScript()
