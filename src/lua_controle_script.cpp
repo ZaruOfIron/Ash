@@ -60,6 +60,29 @@ void LuaControleScript::initialize()
 	// lua_pcall(L, ˆø”, –ß‚è’l, ?)
 	if(lua_pcall(L, 0, 0, 0))	throw LuaCantCallFuncError(luaL_checkstring(L, -1));
 	// –ß‚è’l‚ðŽæ“¾
+	lua_gettable(L, 1, "org_user");
+
+	lua_gettable(L, 1, "answer");
+	int answer = luaL_checknumber(L, -1);
+	lua_gettable(L, 1, "winner");
+	int winner = luaL_checknumber(L, -1);
+	lua_gettable(L, 1, "title");
+	std::string title = luaL_checkstring(L, -1);
+	lua_gettable(L, 1, "subtitle");
+	std::string subtitle = luaL_checkstring(L, -1);
+	lua_gettable(L, 1, "quizid");
+	int quizId = luaL_checknumber(L, -1);
+
+	User orgUser;
+	lua_gettable(L, 2, "correct");
+	orgUser.correct = luaL_checknumber(L, -1);
+	lua_gettable(L, 2, "wrong");
+	orgUser.wrong = luaL_checknumber(L, -1);
+	lua_gettable(L, 2, "score");
+	orgUser.score = luaL_checknumber(L, -1);
+
+	ash_.luaInitialize(answer, winner, title, subtitle, quizId, orgUser);
+
 }
 
 void LuaControleScript::onCommand(int index, int id)
@@ -80,19 +103,17 @@ void LuaControleScript::onCommand(int index, int id)
 int LuaControleScript::luaUser(lua_State *L)
 {
 	int index = luaL_checkint(L, -1);
+	auto& user = thisPtr_->ash_.getUser(index);
 	lua_settop(L, 0);	// Clear the stack
 
-	static const luaL_Reg ash_user[] = {
-		//{ "correct", &LuaControleScript::luaCorrect },
-		//{ "wrong", &LuaControleScript::luaWrong },
-		//{ "score", &LuaControleScript::luaScore },
-		//{ "add_info", &LuaControleScript::luaAddInfo },
-		{ NULL, NULL }
-	};
-
-	luaL_newlib(L, ash_user);
 	lua_pushnumber(L, index);
 	lua_setfield(L, -2, "index");
+	lua_pushnumber(L, user.correct);
+	lua_setfield(L, -2, "correct");
+	lua_pushnumber(L, user.wrong);
+	lua_setfield(L, -2, "wrong");
+	lua_pushnumber(L, user.score);
+	lua_setfield(L, -2, "score");
 
 	return 1;
 }
