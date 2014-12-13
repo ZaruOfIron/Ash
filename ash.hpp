@@ -13,7 +13,7 @@ private:
 	std::unique_ptr<ControleScript> controler_;
 
 public:
-	Ash();
+	Ash(){};
 
 	void update(const UserUpdateMessage& msg);
 };
