@@ -60,23 +60,23 @@ void LuaControleScript::initialize()
 	lua_getfield(L, 1, "org_user");
 
 	lua_getfield(L, 1, "answer");
-	int answer = luaL_checknumber(L, -1);
+	int answer = luaL_checkint(L, -1);
 	lua_getfield(L, 1, "winner");
-	int winner = luaL_checknumber(L, -1);
+	int winner = luaL_checkint(L, -1);
 	lua_getfield(L, 1, "title");
 	std::string title = luaL_checkstring(L, -1);
 	lua_getfield(L, 1, "subtitle");
 	std::string subtitle = luaL_checkstring(L, -1);
 	lua_getfield(L, 1, "quizid");
-	int quizId = luaL_checknumber(L, -1);
+	int quizId = luaL_checkint(L, -1);
 
 	User orgUser;
 	lua_getfield(L, 2, "correct");
-	orgUser.correct = luaL_checknumber(L, -1);
+	orgUser.correct = luaL_checkint(L, -1);
 	lua_getfield(L, 2, "wrong");
-	orgUser.wrong = luaL_checknumber(L, -1);
+	orgUser.wrong = luaL_checkint(L, -1);
 	lua_getfield(L, 2, "score");
-	orgUser.score = luaL_checknumber(L, -1);
+	orgUser.score = luaL_checkint(L, -1);
 
 	ash_.luaInitialize(answer, winner, title, subtitle, quizId, orgUser);
 
