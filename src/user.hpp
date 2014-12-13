@@ -8,7 +8,7 @@ struct User
 	std::string name;
 	int correct, wrong, score;
 
-	User();
+	User(){};
 };
 
 

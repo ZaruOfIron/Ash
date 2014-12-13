@@ -19,7 +19,7 @@ const User& Ash::getUser(int index)
 
 void Ash::luaInitialize(int answer, int winner, const std::string& title, const std::string& subtitle, int quizId, const User& orgUser)
 {
-	users_.resize(userNumber, orgUser);
+	users_.resize(answer, orgUser);
 }
 
 

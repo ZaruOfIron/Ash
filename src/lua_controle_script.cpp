@@ -1,5 +1,6 @@
 #include "lua_controle_script.hpp"
 #include "lua_exception.hpp"
+#include "ash.hpp"
 #include <cassert>
 
 LuaControleScript *LuaControleScript::thisPtr_ = nullptr;
@@ -35,16 +36,11 @@ void LuaControleScript::initialize()
 	// apiÇê›íË
 	static const luaL_Reg ash[] = {
 		{ "user", &LuaControleScript::luaUser },
-		//{ "save", &LuaControleScript::luaSave },
 		{ NULL, NULL }
 	};
 	static const luaL_Reg ash_config[] = {
-		//{ "set_quiz_id", &LuaControleScript::luaSetQuizId },
-		//{ "set_answer_number", &LuaControleScript::luaSetAnswerNumber },
-		//{ "set_title", &LuaControleScript::luaSetTitle },
-		//{ "set_subtitle", &LuaControleScript::luaSetSubtitle },
-		//{ "create_user_button", &LuaControleScript::luaCreateUserButton },
-		//{ "create_system_button", &LuaControleScript::luaCreateSystemButton },
+		{ "create_user_button", &LuaControleScript::luaCreateUserButton },
+		{ "create_system_button", &LuaControleScript::luaCreateSystemButton },
 		{ NULL, NULL }
 	};
 
@@ -60,25 +56,25 @@ void LuaControleScript::initialize()
 	// lua_pcall(L, à¯êî, ñﬂÇËíl, ?)
 	if(lua_pcall(L, 0, 0, 0))	throw LuaCantCallFuncError(luaL_checkstring(L, -1));
 	// ñﬂÇËílÇéÊìæ
-	lua_gettable(L, 1, "org_user");
+	lua_getfield(L, 1, "org_user");
 
-	lua_gettable(L, 1, "answer");
+	lua_getfield(L, 1, "answer");
 	int answer = luaL_checknumber(L, -1);
-	lua_gettable(L, 1, "winner");
+	lua_getfield(L, 1, "winner");
 	int winner = luaL_checknumber(L, -1);
-	lua_gettable(L, 1, "title");
+	lua_getfield(L, 1, "title");
 	std::string title = luaL_checkstring(L, -1);
-	lua_gettable(L, 1, "subtitle");
+	lua_getfield(L, 1, "subtitle");
 	std::string subtitle = luaL_checkstring(L, -1);
-	lua_gettable(L, 1, "quizid");
+	lua_getfield(L, 1, "quizid");
 	int quizId = luaL_checknumber(L, -1);
 
 	User orgUser;
-	lua_gettable(L, 2, "correct");
+	lua_getfield(L, 2, "correct");
 	orgUser.correct = luaL_checknumber(L, -1);
-	lua_gettable(L, 2, "wrong");
+	lua_getfield(L, 2, "wrong");
 	orgUser.wrong = luaL_checknumber(L, -1);
-	lua_gettable(L, 2, "score");
+	lua_getfield(L, 2, "score");
 	orgUser.score = luaL_checknumber(L, -1);
 
 	ash_.luaInitialize(answer, winner, title, subtitle, quizId, orgUser);
