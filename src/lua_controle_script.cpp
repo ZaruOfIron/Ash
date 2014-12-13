@@ -27,6 +27,7 @@ LuaControleScript::~LuaControleScript()
 	thisPtr_ = nullptr;
 }
 
+#include <iostream>
 void LuaControleScript::initialize()
 {
 	auto L = lua_.get();
@@ -54,7 +55,7 @@ void LuaControleScript::initialize()
 	lua_getglobal(L, "initialize");
 	// ŒÄ‚Ño‚·
 	// lua_pcall(L, ˆø”, –ß‚è’l, ?)
-	if(lua_pcall(L, 0, 0, 0))	throw LuaCantCallFuncError(luaL_checkstring(L, -1));
+	if(lua_pcall(L, 0, 1, 0))	throw LuaCantCallFuncError(luaL_checkstring(L, -1));
 	// –ß‚è’l‚ğæ“¾
 	lua_getfield(L, 1, "org_user");
 
