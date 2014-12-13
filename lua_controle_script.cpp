@@ -1,4 +1,5 @@
 #include "lua_controle_script.hpp"
+#include "lua_exception.hpp"
 #include <cassert>
 
 LuaControleScript *LuaControleScript::thisPtr_ = nullptr;
@@ -13,6 +14,8 @@ LuaControleScript::LuaControleScript(Ash& ash, const std::string& filename)
 	// Lua Scriptを初期化
 	auto L = lua_.get();
 	luaL_openlibs(L);
+	if(luaL_loadfile(L, filename_.c_str()) || lua_pcall(L, 0, 0, 0))
+		throw LuaCantLoadFileError(luaL_checkstring(L, -1));
 }
 
 void LuaControleScript::initialize()
@@ -41,17 +44,13 @@ void LuaControleScript::initialize()
 	luaL_newlib(L, ash_config);
 	lua_setfield(L, -2, "config");
 	lua_setglobal(L, "ash");
-
-	// グローバルの処理をまわす
-	luaL_loadfile(L, filename_.c_str());
-	if(lua_pcall(L, 0, 0, 0))	throw std::runtime_error(luaL_checkstring(L, -1));
-
+	
 	// initialize()を呼び出す
 	// 関数を積む
 	lua_getglobal(L, "initialize");
 	// 呼び出す
 	// lua_pcall(L, 引数, 戻り値, ?)
-	if(lua_pcall(L, 0, 0, 0))	throw std::runtime_error(luaL_checkstring(L, -1));
+	if(lua_pcall(L, 0, 0, 0))	throw LuaCantCallFuncError(luaL_checkstring(L, -1));
 	// 戻り値を取得
 }
 
@@ -67,7 +66,7 @@ void LuaControleScript::onCommand(int index, int id)
 	lua_pushnumber(L, id);
 	// 呼び出す
 	// lua_pcall(L, 引数, 戻り値, ?)
-	if(lua_pcall(L, 2, 0, 0))	throw std::runtime_error(luaL_checkstring(L, -1));
+	if(lua_pcall(L, 2, 0, 0))	throw LuaCantCallFuncError(luaL_checkstring(L, -1));
 }
 
 int LuaControleScript::luaUser(lua_State *L)
