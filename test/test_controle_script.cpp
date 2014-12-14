@@ -3,6 +3,8 @@
 #include "lua_controle_script.hpp"
 #include "lua_exception.hpp"
 
+#include <iostream>
+
 BOOST_AUTO_TEST_CASE( no_script )
 {
 	Ash ash;
@@ -48,3 +50,24 @@ BOOST_AUTO_TEST_CASE( get_set_user )
 	BOOST_CHECK_NO_THROW(controle.initialize());
 	BOOST_CHECK_NO_THROW(controle.onCommand(1, 1));
 }
+
+BOOST_AUTO_TEST_CASE( create_user_button )
+{
+	Ash ash;
+	LuaControleScript controle(ash, "script/create_user_button.lua");
+	BOOST_CHECK_NO_THROW(controle.initialize());
+	BOOST_CHECK_NO_THROW(controle.onCommand(1, 1));
+	std::cout << "Check from create_user_button" << std::endl;
+	controle.run();
+}
+
+BOOST_AUTO_TEST_CASE( create_system_button )
+{
+	Ash ash;
+	LuaControleScript controle(ash, "script/create_system_button.lua");
+	BOOST_CHECK_NO_THROW(controle.initialize());
+	BOOST_CHECK_NO_THROW(controle.onCommand(1, 1));
+	std::cout << "Check from create_system_button" << std::endl;
+	controle.run();
+}
+
