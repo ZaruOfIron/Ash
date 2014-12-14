@@ -17,4 +17,11 @@ BOOST_AUTO_TEST_CASE( empty_script )
 	BOOST_CHECK_THROW(controle.onCommand(0, 0), LuaCantCallFuncError);
 }
 
+BOOST_AUTO_TEST_CASE( simplest_script )
+{
+	Ash ash;
+	LuaControleScript controle(ash, "script/simplest_script.lua");
+	BOOST_CHECK_NO_THROW(controle.initialize());
+	BOOST_CHECK_NO_THROW(controle.onCommand(1, 1));
+}
 
