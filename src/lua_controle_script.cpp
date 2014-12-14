@@ -61,7 +61,7 @@ void LuaControleScript::initialize()
 	lua_getfield(L, 1, "org_user");
 
 	lua_getfield(L, 1, "answer");
-	int answer = luaL_checkint(L, -1);
+	answer_ = luaL_checkint(L, -1);
 	lua_getfield(L, 1, "winner");
 	int winner = luaL_checkint(L, -1);
 	lua_getfield(L, 1, "title");
@@ -79,12 +79,12 @@ void LuaControleScript::initialize()
 	lua_getfield(L, 2, "score");
 	orgUser.score = luaL_checkint(L, -1);
 
-	ash_.luaInitialize(answer, winner, title, subtitle, quizId, orgUser);
+	ash_.luaInitialize(answer_, winner, title, subtitle, quizId, orgUser);
 }
 
 void LuaControleScript::run()
 {
-	window_->run();
+	window_->run(answer_);
 }
 
 void LuaControleScript::onCommand(int index, int id)

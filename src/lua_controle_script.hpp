@@ -17,6 +17,7 @@ private:
 	std::string filename_;
 	Ash& ash_;
 	static LuaControleScript *thisPtr_;
+	int answer_;
 
 	static int luaGetUser(lua_State *L);
 	static int luaSetUser(lua_State *L);
