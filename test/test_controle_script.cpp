@@ -25,3 +25,26 @@ BOOST_AUTO_TEST_CASE( simplest_script )
 	BOOST_CHECK_NO_THROW(controle.onCommand(1, 1));
 }
 
+BOOST_AUTO_TEST_CASE( get_user )
+{
+	Ash ash;
+	LuaControleScript controle(ash, "script/get_user.lua");
+	BOOST_CHECK_NO_THROW(controle.initialize());
+	BOOST_CHECK_NO_THROW(controle.onCommand(1, 1));
+}
+
+BOOST_AUTO_TEST_CASE( set_user )
+{
+	Ash ash;
+	LuaControleScript controle(ash, "script/set_user.lua");
+	BOOST_CHECK_NO_THROW(controle.initialize());
+	BOOST_CHECK_NO_THROW(controle.onCommand(1, 1));
+}
+
+BOOST_AUTO_TEST_CASE( get_set_user )
+{
+	Ash ash;
+	LuaControleScript controle(ash, "script/get_set_user.lua");
+	BOOST_CHECK_NO_THROW(controle.initialize());
+	BOOST_CHECK_NO_THROW(controle.onCommand(1, 1));
+}
