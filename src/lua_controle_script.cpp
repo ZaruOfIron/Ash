@@ -103,7 +103,8 @@ int LuaControleScript::luaGetUser(lua_State *L)
 	auto& user = thisPtr_->ash_.getUser(index);
 	lua_settop(L, 0);	// Clear the stack
 
-	lua_pushnumber(L, index);
+	lua_newtable(L);
+	lua_pushnumber(L, index + 1);
 	lua_setfield(L, -2, "index");
 	lua_pushnumber(L, user.correct);
 	lua_setfield(L, -2, "correct");

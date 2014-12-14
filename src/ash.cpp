@@ -22,7 +22,16 @@ void Ash::luaInitialize(int answer, int winner, const std::string& title, const 
 	users_.resize(answer, orgUser);
 }
 
+#include <iostream>
 void Ash::luaUpdate(const UserUpdateMessage& msg)
 {
+	std::cout << "Ash::luaUpdate() : index = " << msg.index << std::endl;
+	if(msg.name)	std::cout << "\tname    = " << *(msg.name) << std::endl;
+	if(msg.correct)	std::cout << "\tcorrect = " << *(msg.correct) << std::endl;
+	if(msg.wrong)	std::cout << "\twrong   = " << *(msg.wrong) << std::endl;
+	if(msg.score)	std::cout << "\tscore   = " << *(msg.score) << std::endl;
+	std::cout << "\t";
+	for(int id : msg.info)	std::cout << id << " ";
+	std::cout << std::endl;
 }
 
