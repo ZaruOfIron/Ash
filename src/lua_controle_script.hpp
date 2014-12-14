@@ -18,7 +18,9 @@ private:
 	Ash& ash_;
 	static LuaControleScript *thisPtr_;
 
-	static int luaUser(lua_State *L);
+	static int luaGetUser(lua_State *L);
+	static int luaSetUser(lua_State *L);
+
 public:
 	LuaControleScript(Ash& ash, const std::string& filename);
 	~LuaControleScript();

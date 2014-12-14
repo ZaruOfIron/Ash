@@ -27,7 +27,6 @@ LuaControleScript::~LuaControleScript()
 	thisPtr_ = nullptr;
 }
 
-#include <iostream>
 void LuaControleScript::initialize()
 {
 	auto L = lua_.get();
@@ -36,12 +35,13 @@ void LuaControleScript::initialize()
 
 	// apiを設定
 	static const luaL_Reg ash[] = {
-		{ "user", &LuaControleScript::luaUser },
+		{ "get_user", &LuaControleScript::luaGetUser },
+		{ "set_user", &LuaControleScript::luaSetUser },
 		{ NULL, NULL }
 	};
 	static const luaL_Reg ash_config[] = {
-		{ "create_user_button", &LuaControleScript::luaCreateUserButton },
-		{ "create_system_button", &LuaControleScript::luaCreateSystemButton },
+	//	{ "create_user_button", &LuaControleScript::luaCreateUserButton },
+	//	{ "create_system_button", &LuaControleScript::luaCreateSystemButton },
 		{ NULL, NULL }
 	};
 
@@ -97,7 +97,7 @@ void LuaControleScript::onCommand(int index, int id)
 	if(lua_pcall(L, 2, 0, 0))	throw LuaCantCallFuncError(luaL_checkstring(L, -1));
 }
 
-int LuaControleScript::luaUser(lua_State *L)
+int LuaControleScript::luaGetUser(lua_State *L)
 {
 	int index = luaL_checkint(L, -1);
 	auto& user = thisPtr_->ash_.getUser(index);
@@ -113,5 +113,36 @@ int LuaControleScript::luaUser(lua_State *L)
 	lua_setfield(L, -2, "score");
 
 	return 1;
+}
+
+int LuaControleScript::luaSetUser(lua_State *L)
+{
+	// 1: index, 2: data, 3: info
+
+	// 引数の数を取得する
+	int argCount = lua_gettop(L);
+
+	UserUpdateMessage msg;
+	msg.index = luaL_checkint(L, 1);
+
+	lua_getfield(L, 2, "correct");
+	if(!lua_isnil(L, -1))	msg.correct = luaL_checkint(L, -1);
+	lua_getfield(L, 2, "wrong");
+	if(!lua_isnil(L, -1))	msg.wrong = luaL_checkint(L, -1);
+	lua_getfield(L, 2, "score");
+	if(!lua_isnil(L, -1))	msg.score = luaL_checkint(L, -1);
+
+	// テーブルの中身を全部引っ張り出す
+	if(argCount == 3){	// 第三引数があれば
+		lua_pushnil(L);
+		while(lua_next(L, 3)){
+			msg.info.push_back(luaL_checkint(L, -1));
+			lua_pop(L, 1);
+		}
+	}
+
+	thisPtr_->ash_.luaUpdate(msg);
+
+	return 0;
 }
 
