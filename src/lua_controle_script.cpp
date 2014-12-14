@@ -99,7 +99,7 @@ void LuaControleScript::onCommand(int index, int id)
 
 int LuaControleScript::luaGetUser(lua_State *L)
 {
-	int index = luaL_checkint(L, -1);
+	int index = luaL_checkint(L, -1) - 1;
 	auto& user = thisPtr_->ash_.getUser(index);
 	lua_settop(L, 0);	// Clear the stack
 
@@ -123,7 +123,7 @@ int LuaControleScript::luaSetUser(lua_State *L)
 	int argCount = lua_gettop(L);
 
 	UserUpdateMessage msg;
-	msg.index = luaL_checkint(L, 1);
+	msg.index = luaL_checkint(L, 1) - 1;
 
 	lua_getfield(L, 2, "correct");
 	if(!lua_isnil(L, -1))	msg.correct = luaL_checkint(L, -1);
