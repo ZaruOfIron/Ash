@@ -104,12 +104,12 @@ void LuaControleScript::onCommand(int index, int id)
 
 int LuaControleScript::luaGetUser(lua_State *L)
 {
-	int index = luaL_checkint(L, -1) - 1;
-	auto& user = thisPtr_->ash_.getUser(index);
+	int index = luaL_checkint(L, -1);
+	auto& user = thisPtr_->ash_.getUser(index - 1);
 	lua_settop(L, 0);	// Clear the stack
 
 	lua_newtable(L);
-	lua_pushnumber(L, index + 1);
+	lua_pushnumber(L, index);
 	lua_setfield(L, -2, "index");
 	lua_pushnumber(L, user.correct);
 	lua_setfield(L, -2, "correct");
