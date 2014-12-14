@@ -79,6 +79,12 @@ void LuaControleScript::initialize()
 	lua_getfield(L, 2, "score");
 	orgUser.score = luaL_checkint(L, -1);
 
+	// ash.config‚ðnil‚É‚µ‚Ä‚¨‚­
+	lua_getglobal(L, "ash");
+	lua_pushnil(L);
+	lua_setfield(L, -2, "config");
+	lua_setglobal(L, "ash");
+
 	ash_.luaInitialize(answer_, winner, title, subtitle, quizId, orgUser);
 }
 
