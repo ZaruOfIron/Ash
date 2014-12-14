@@ -32,6 +32,7 @@ public:
 	void run();
 
 	void onCommand(int index, int id);
+	void onCommand(int index, const std::string& name);	// name
 
 };
 

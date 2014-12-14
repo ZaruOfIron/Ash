@@ -102,6 +102,13 @@ void LuaControleScript::onCommand(int index, int id)
 	if(lua_pcall(L, 2, 0, 0))	throw LuaCantCallFuncError(luaL_checkstring(L, -1));
 }
 
+void LuaControleScript::onCommand(int index, const std::string& name)
+{
+	UserUpdateMessage msg;
+	msg.index = index - 1;
+	msg.name = name;
+}
+
 int LuaControleScript::luaGetUser(lua_State *L)
 {
 	int index = luaL_checkint(L, -1);
