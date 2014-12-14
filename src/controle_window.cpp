@@ -93,7 +93,7 @@ void ControleWindow::OnCreate()
 			frame_->systemForm_.at(i).caption.c_str(),
 			WS_CHILD | WS_VISIBLE | WS_TABSTOP | BS_PUSHBUTTON,
 			rect.left, rect.top, rect.Width(), FORM_PART_HEIGHT,
-			GetHwnd(), reinterpret_cast<HMENU>(i),
+			GetHwnd(), reinterpret_cast<HMENU>(i + 1),
 			::GetModuleHandle(NULL), NULL);
 	}
 
@@ -107,8 +107,20 @@ void ControleWindow::OnDestroy()
 
 BOOL ControleWindow::OnCommand(WPARAM wParam, LPARAM lParam)
 {
+	int num = LOWORD(wParam), id = (num & 0xff), index = (num >> 8);
+	if(index < 0)	return FALSE;
 
-	return FALSE;
+	if(id == 0){	// Edit
+		//if(HIWORD(wParam) == EN_UPDATE){
+		if(HIWORD(wParam) == EN_KILLFOCUS){
+			frame_->controler_->onCommand(index, std::string(GetDlgItem(num)->GetWindowText()));
+		}
+	}
+	else{
+		frame_->controler_->onCommand(index, id);
+	}
+
+	return TRUE;
 }
 
 LRESULT ControleWindow::WndProc(UINT uMsg, WPARAM wParam, LPARAM lParam)

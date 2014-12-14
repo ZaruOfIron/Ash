@@ -5,5 +5,5 @@ function initialize()
 end
 
 function on_command(index, id)
-
+	print(string.format('idx:%d, id:%d', index, id))
 end
