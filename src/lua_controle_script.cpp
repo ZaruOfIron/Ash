@@ -1,6 +1,7 @@
 #include "lua_controle_script.hpp"
 #include "lua_exception.hpp"
 #include "ash.hpp"
+#include "controle_window.hpp"
 #include <cassert>
 
 LuaControleScript *LuaControleScript::thisPtr_ = nullptr;
@@ -31,7 +32,7 @@ void LuaControleScript::initialize()
 {
 	auto L = lua_.get();
 
-	//window_.reset(new ControleWindow(this));
+	window_.reset(new ControleWindowFrame(this));
 
 	// api‚ðÝ’è
 	static const luaL_Reg ash[] = {
@@ -40,8 +41,8 @@ void LuaControleScript::initialize()
 		{ NULL, NULL }
 	};
 	static const luaL_Reg ash_config[] = {
-	//	{ "create_user_button", &LuaControleScript::luaCreateUserButton },
-	//	{ "create_system_button", &LuaControleScript::luaCreateSystemButton },
+		{ "create_user_button", &LuaControleScript::luaCreateUserButton },
+		{ "create_system_button", &LuaControleScript::luaCreateSystemButton },
 		{ NULL, NULL }
 	};
 
@@ -79,7 +80,11 @@ void LuaControleScript::initialize()
 	orgUser.score = luaL_checkint(L, -1);
 
 	ash_.luaInitialize(answer, winner, title, subtitle, quizId, orgUser);
+}
 
+void LuaControleScript::run()
+{
+	window_->run();
 }
 
 void LuaControleScript::onCommand(int index, int id)
@@ -145,5 +150,15 @@ int LuaControleScript::luaSetUser(lua_State *L)
 	thisPtr_->ash_.luaUpdate(msg);
 
 	return 0;
+}
+
+int LuaControleScript::luaCreateUserButton(lua_State *L)
+{
+	thisPtr_->window_->registerUserButton(ButtonData(luaL_checkint(L, 1), luaL_checkstring(L, 2)));
+}
+
+int LuaControleScript::luaCreateSystemButton(lua_State *L)
+{
+	thisPtr_->window_->registerSystemButton(ButtonData(luaL_checkint(L, 1), luaL_checkstring(L, 2)));
 }
 

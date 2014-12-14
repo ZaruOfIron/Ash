@@ -14,7 +14,8 @@ struct ButtonData
 	int id;
 	std::string caption;
 
-	ButtonData(int id_, const std::string& caption_);
+	ButtonData(int id_, const std::string& caption_)
+		: id(id_), caption(caption_){}
 };
 
 class ControleWindowFrame : private CWinApp
@@ -27,18 +28,19 @@ private:
 public:
 	friend ControleWindow;
 
-	ControleWindowFrame(LuaControleScript *controler_);
+	ControleWindowFrame(LuaControleScript *controler);
 
 	void registerUserButton(const ButtonData& data);
 	void registerSystemButton(const ButtonData& data);
 	
-	void run(int answer);
+	int run(int answer);
 };
 
 class ControleWindow : public CWnd
 {
 private:
 	ControleWindowFrame *frame_;
+	int answer_;
 
 	enum {
 		FORM_PART_WIDTH = 100,
@@ -54,7 +56,7 @@ private:
 	BOOL OnCommand(WPARAM wParam, LPARAM lParam);
 
 public:
-	ControleWindow(ControleWindowFrame *frame);
+	ControleWindow(ControleWindowFrame *frame, int answer);
 	
 	LRESULT WndProc(UINT uMsg, WPARAM wParam, LPARAM lParam);
 };
