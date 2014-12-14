@@ -76,15 +76,15 @@ void ControleWindow::OnCreate()
 	}
 
 	// System FormÇê›íu
-	scrHeight += 10;
+	int systemY = scrHeight;
 	for(int i = 0;i < frame_->systemForm_.size();i++){
 		int nx = i % 6, ny = i / 6;
 
 		CRect rect(
 			10 + nx * (FORM_PART_WIDTH + 20),
-			10 + (FORM_PART_HEIGHT + 10) * ny,
+			systemY + 10 + (FORM_PART_HEIGHT + 10) * ny,
 			10 + nx * (FORM_PART_WIDTH + 20) + FORM_PART_WIDTH,
-			10 + (FORM_PART_HEIGHT + 10) * (ny + 1));
+			systemY + 10 + (FORM_PART_HEIGHT + 10) * (ny + 1));
 		if(scrHeight < rect.bottom + 10)	scrHeight = rect.bottom + 10;
 
 		::CreateWindowEx(
@@ -92,7 +92,7 @@ void ControleWindow::OnCreate()
 			"BUTTON",
 			frame_->systemForm_.at(i).caption.c_str(),
 			WS_CHILD | WS_VISIBLE | WS_TABSTOP | BS_PUSHBUTTON,
-			rect.left, rect.top, rect.Width(), rect.Height(),
+			rect.left, rect.top, rect.Width(), FORM_PART_HEIGHT,
 			GetHwnd(), reinterpret_cast<HMENU>(i),
 			::GetModuleHandle(NULL), NULL);
 	}
