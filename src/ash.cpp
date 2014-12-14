@@ -1,10 +1,11 @@
 #include "ash.hpp"
 #include "lua_controle_script.hpp"
+#include "copydata_view.hpp"
 
 //#include <iostream>
 
 Ash::Ash()
-	: users_(), controler_()
+	: users_(), controler_(), view_(new CopyDataView("AUAUA"))
 {
 }
 
@@ -22,6 +23,12 @@ const User& Ash::getUser(int index)
 void Ash::luaInitialize(int answer, int winner, const std::string& title, const std::string& subtitle, int quizId, const User& orgUser)
 {
 	users_.resize(answer, orgUser);
+
+	view_->initialize(answer, winner, title, subtitle, quizId);
+
+	for(int i = 0;i < answer;i++){
+		view_->sendUserModified(i, orgUser, 0x0f);
+	}
 }
 
 void Ash::luaUpdate(const UserUpdateMessage& msg)
@@ -35,5 +42,28 @@ void Ash::luaUpdate(const UserUpdateMessage& msg)
 	for(int id : msg.info)	std::cout << id << " ";
 	std::cout << std::endl;
 	*/
+
+	User user;
+	int modIndex = 0;
+	if(msg.name){
+		user.name = *(msg.name);
+		modIndex |= 1 << 0;
+	}
+	if(msg.correct){
+		user.correct = *(msg.correct);
+		modIndex |= 1 << 1;
+	}
+	if(msg.wrong){
+		user.wrong = *(msg.wrong);
+		modIndex |= 1 << 2;
+	}
+	if(msg.score){
+		user.score = *(msg.score);
+		modIndex |= 1 << 3;
+	}
+
+	view_->sendUserModified(msg.index, user, modIndex);
+
+	for(int id : msg.info)	view_->sendInfo(id);
 }
 
