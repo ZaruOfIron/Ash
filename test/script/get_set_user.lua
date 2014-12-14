@@ -4,6 +4,6 @@ end
 
 function on_command(index, id)
 	local user = ash.get_user(index)
-	print(string.format("i:%d,c:%d,w:%d,s:%d\n", user.index, user.correct, user.wrong, user.score))
+	--print(string.format("i:%d,c:%d,w:%d,s:%d\n", user.index, user.correct, user.wrong, user.score))
 	ash.set_user(user.index, {correct = 30}, {100})
 end
