@@ -5,7 +5,7 @@
 #include "view.hpp"
 #include <wincore.h>
 
-class CopyDataView
+class CopyDataView : public View
 {
 private:
 	HWND hTarget_;
