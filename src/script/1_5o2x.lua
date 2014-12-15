@@ -1,3 +1,5 @@
+ANSWER = 12
+WINNER = 5
 CORRECT_LIMIT = 5
 WRONG_LIMIT = 2
 suc_index = 0
@@ -11,8 +13,8 @@ function initialize()
 
 	-- return info
 	return {
-		answer = 12,
-		winner = 5,
+		answer = ANSWER,
+		winner = WINNER,
 		title = '1st stage',
 		subtitle = 'ÇTÅõÇQÅ~',
 		quizid = 101,
