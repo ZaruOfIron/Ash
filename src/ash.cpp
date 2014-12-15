@@ -76,7 +76,7 @@ void Ash::luaUpdate(const UserUpdateMessage& msg)
 	for(int id : msg.info){
 		// Ÿ‚¿”²‚¯(1)‚Æ”s‘Þ(2)‚Í‹L˜^‚µ‚Ä‚¨‚­
 		if(id == 1)	user.status = User::STATUS::WINNER;
-		else if(id == 2)	user.status == User::STATUS::LOSER;
+		else if(id == 2)	user.status = User::STATUS::LOSER;
 
 		view_->sendInfo(id);
 	}
