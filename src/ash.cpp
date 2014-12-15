@@ -43,7 +43,7 @@ void Ash::luaUpdate(const UserUpdateMessage& msg)
 	std::cout << std::endl;
 	*/
 
-	User user;
+	auto& user = users_.at(msg.index);
 	int modIndex = 0;
 	if(msg.name){
 		user.name = *(msg.name);
@@ -64,6 +64,9 @@ void Ash::luaUpdate(const UserUpdateMessage& msg)
 
 	view_->sendUserModified(msg.index, user, modIndex);
 
-	for(int id : msg.info)	view_->sendInfo(id);
+	for(int id : msg.info){
+		// Ÿ‚¿”²‚¯
+		view_->sendInfo(id);
+	}
 }
 
