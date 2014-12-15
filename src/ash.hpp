@@ -3,10 +3,9 @@
 
 #include "user.hpp"
 #include "controle_script.hpp"
+#include "view.hpp"
 #include <memory>
 #include <vector>
-
-class View;
 
 class Ash
 {
@@ -28,6 +27,8 @@ public:
 	Ash();
 
 	void setScript(const std::string& filename);
+	void run();
+
 	const User& getUser(int index);
 
 	void luaInitialize(int answer, int winner, const std::string& title, const std::string& subtitle, int quizId, const User& orgUser);

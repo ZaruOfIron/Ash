@@ -6,7 +6,7 @@
 CopyDataView::CopyDataView(const std::string& targetTitle)
 {
 	hTarget_ = ::FindWindow(NULL, targetTitle.c_str());
-	assert(hTarget_ != NULL);
+	//assert(hTarget_ != NULL);
 }
 
 bool CopyDataView::isTargetValid()
@@ -14,8 +14,12 @@ bool CopyDataView::isTargetValid()
 	return hTarget_ != NULL && ::IsWindow(hTarget_);
 }
 
+#include <iostream>
 void CopyDataView::sendData(int id, const std::string& str)
 {
+	std::cout << id << ": " << str << std::endl;
+
+	/*
 	// const‰ñ”ð
 	std::shared_ptr<char> data(new char[str.size()], std::default_delete<char[]>());
 	std::memcpy(data.get(), str.c_str(), str.size());
@@ -30,6 +34,7 @@ void CopyDataView::sendData(int id, const std::string& str)
 		WM_COPYDATA,
 		NULL,
 		reinterpret_cast<LPARAM>(&msg));
+	*/
 }
 
 void CopyDataView::initialize(int answerNumber, int winnerNumber, const std::string& title, const std::string& subtitle, int quizId)

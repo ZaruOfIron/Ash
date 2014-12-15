@@ -15,6 +15,11 @@ void Ash::setScript(const std::string& filename)
 	controler_->initialize();
 }
 
+void Ash::run()
+{
+	controler_->run();
+}
+
 const User& Ash::getUser(int index)
 {
 	return users_.at(index);

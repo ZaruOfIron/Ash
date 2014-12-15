@@ -19,6 +19,7 @@ public:
 	virtual ~ControleScript(){}
 
 	virtual void initialize() = 0;
+	virtual void run() = 0;
 
 };
 
