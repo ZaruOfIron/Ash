@@ -7,10 +7,12 @@ struct User
 {
 	std::string name;
 	int correct, wrong, score;
-	bool hasWon;
+	enum class STATUS {
+		FIGHTER, WINNER, LOSER
+	} status;
 
 	User()
-		: name(), correct(0), wrong(0), score(0), hasWon(false){}
+		: name(), correct(0), wrong(0), score(0), status(STATUS::FIGHTER){}
 };
 
 
