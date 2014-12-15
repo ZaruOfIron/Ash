@@ -9,7 +9,8 @@ struct User
 	int correct, wrong, score;
 	bool hasWon;
 
-	User(){};
+	User()
+		: name(), correct(0), wrong(0), score(0), hasWon(false){}
 };
 
 
