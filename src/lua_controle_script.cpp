@@ -98,7 +98,7 @@ void LuaControleScript::onCommand(int index, int id)
 	auto L = lua_.get();
 
 	// ‘ÎÛŠO‚Å‚ ‚ê‚ÎŒÄ‚Î‚È‚¢
-	if(ash_.getUser(index - 1).status != User::STATUS::FIGHTER)
+	if(index != 0 && ash_.getUser(index - 1).status != User::STATUS::FIGHTER)
 		return;
 
 	// on_command()‚ğŒÄ‚Ño‚·
