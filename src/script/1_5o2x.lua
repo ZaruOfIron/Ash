@@ -38,6 +38,7 @@ function on_command(index, id)
 		end
 
 		if data.correct >= CORRECT_LIMIT then	-- clear
+			data.correct = CORRECT_LIMIT
 			table.insert(info, 1)
 		end
 	elseif id == 2 then	-- wrong
@@ -48,6 +49,7 @@ function on_command(index, id)
 		end
 
 		if data.wrong >= WRONG_LIMIT then	-- fail
+			data.wrong = WRONG_LIMIT
 			table.insert(info, 2)
 		end
 	end
