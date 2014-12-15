@@ -7,6 +7,7 @@ struct User
 {
 	std::string name;
 	int correct, wrong, score;
+	bool hasWon;
 
 	User(){};
 };
