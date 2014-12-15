@@ -6,11 +6,14 @@
 #include <memory>
 #include <vector>
 
+class View;
+
 class Ash
 {
 private:
 	std::vector<User> users_;
 	std::unique_ptr<ControleScript> controler_;
+	std::unique_ptr<View> view_;
 
 public:
 	Ash();
