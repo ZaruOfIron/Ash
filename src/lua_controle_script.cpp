@@ -113,6 +113,8 @@ void LuaControleScript::onCommand(int index, const std::string& name)
 	UserUpdateMessage msg;
 	msg.index = index - 1;
 	msg.name = name;
+
+	thisPtr_->ash_.luaUpdate(msg);
 }
 
 int LuaControleScript::luaGetUser(lua_State *L)
