@@ -97,6 +97,10 @@ void LuaControleScript::onCommand(int index, int id)
 {
 	auto L = lua_.get();
 
+	// 対象外であれば呼ばない
+	if(ash_.getUser(index - 1).status != User::STATUS::FIGHTER)
+		return;
+
 	// on_command()を呼び出す
 	// 関数を積む
 	lua_getglobal(L, "on_command");
@@ -122,6 +126,12 @@ int LuaControleScript::luaGetUser(lua_State *L)
 	int index = luaL_checkint(L, -1);
 	auto& user = thisPtr_->ash_.getUser(index - 1);
 	lua_settop(L, 0);	// Clear the stack
+
+	// 対象外のユーザーであればnilを返す
+	if(user.status != User::STATUS::FIGHTER){
+		lua_pushnil(L);
+		return 1;
+	}
 
 	lua_newtable(L);
 	lua_pushnumber(L, index);
