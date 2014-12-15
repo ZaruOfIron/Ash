@@ -83,7 +83,8 @@ void Ash::luaUpdate(const UserUpdateMessage& msg)
 	if(status == FINISH_STATUS::WIN_FINISH){
 		for(int i = 0;i < users_.size();i++){
 			auto& user = users_.at(i);
-			if(user.status == User::STATUS::FIGHTER)	user.status = User::STATUS::LOSER;
+			if(user.status != User::STATUS::FIGHTER)	continue;
+			user.status = User::STATUS::LOSER;
 			view_->sendUserModified(i, user, 0);
 			view_->sendInfo(2);
 		}
@@ -91,7 +92,8 @@ void Ash::luaUpdate(const UserUpdateMessage& msg)
 	else if(status == FINISH_STATUS::LOSE_FINISH){
 		for(int i = 0;i < users_.size();i++){
 			auto& user = users_.at(i);
-			if(user.status == User::STATUS::FIGHTER)	user.status = User::STATUS::WINNER;
+			if(user.status != User::STATUS::FIGHTER)	continue;
+			user.status = User::STATUS::WINNER;
 			view_->sendUserModified(i, user, 0);
 			view_->sendInfo(1);
 		}
