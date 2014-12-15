@@ -50,6 +50,10 @@ void Ash::luaUpdate(const UserUpdateMessage& msg)
 	*/
 
 	auto& user = users_.at(msg.index);
+	if(user.status != User::STATUS::FIGHTER){	// �ΏۊO
+		return;
+	}
+
 	int modIndex = 0;
 	if(msg.name){
 		user.name = *(msg.name);
