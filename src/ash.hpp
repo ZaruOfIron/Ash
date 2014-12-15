@@ -14,7 +14,16 @@ private:
 	std::vector<User> users_;
 	std::unique_ptr<ControleScript> controler_;
 	std::unique_ptr<View> view_;
+	int winner_;
 
+	// クイズの終了確認を行う
+	// 戻り値が
+	enum class FINISH_STATUS {
+		FIGHTING,	// まだ終了していない
+		WIN_FINISH,	// 勝ち抜け者の制限到達による終了
+		LOSE_FINISH	// 敗退者の制限到達による終了
+	};
+	FINISH_STATUS getFinishStatus() const;
 public:
 	Ash();
 
