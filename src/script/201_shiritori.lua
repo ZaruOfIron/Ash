@@ -46,7 +46,7 @@ function on_command(index, id)
 
 			-- ‚¤‚¦‚©‚çWINNERŒÂ‚Í’Ê‰ß
 			for i = 1, WINNER do
-				ash.set_user(index, {}, {1})
+				ash.set_user(users[i].index, {}, {1})
 			end
 		end
 	else	-- user
