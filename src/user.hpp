@@ -2,6 +2,8 @@
 #define ___USER_HPP___
 
 #include <string>
+#include <boost/serialization/serialization.hpp>
+#include <boost/serialization/string.hpp>
 
 struct User
 {
@@ -13,6 +15,14 @@ struct User
 
 	User()
 		: name(), correct(0), wrong(0), score(0), status(STATUS::FIGHTER){}
+
+private:
+	friend class boost::serialization::access;
+	template<class Archive>
+		void serialize(Archive& ar, const unsigned int version)
+		{
+			ar & name & correct & wrong & score & status;
+		}
 };
 
 

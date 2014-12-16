@@ -7,6 +7,8 @@
 #include <memory>
 #include <vector>
 
+std::string getDateTimeString();
+
 class Ash
 {
 private:
@@ -14,6 +16,29 @@ private:
 	std::unique_ptr<ControleScript> controler_;
 	std::unique_ptr<View> view_;
 	int winner_;
+	std::string saveFileName_;
+
+	struct SaveData
+	{
+		int index;
+		User user;
+		int modIndex;
+		std::vector<int> info;
+		std::string luaVars;
+
+		SaveData()
+			: index(-1){}
+
+	private:
+		friend class boost::serialization::access;
+		template<class Archive>
+			void serialize(Archive& ar, const unsigned int version)
+			{
+				ar & index & user & modIndex & info & luaVars;
+			}
+	};
+	std::vector<SaveData> blankData_;
+	std::vector<std::string> saves_;
 
 	// クイズの終了確認を行う
 	// 戻り値が
@@ -28,6 +53,7 @@ public:
 
 	void setScript(const std::string& filename);
 	void run();
+	void undo();
 
 	const User& getUser(int index) const;
 	bool hasFinished() const;

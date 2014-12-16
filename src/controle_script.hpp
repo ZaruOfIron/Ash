@@ -14,13 +14,6 @@ struct UserUpdateMessage
 	boost::optional<std::string> name;
 	boost::optional<int> correct, wrong, score;
 	std::vector<int> info;
-
-	friend class boost::serialization::access;
-	template<class Archive>
-		void serialize(Archive& ar, const unsigned int version)
-		{
-			ar & index & name & correct & wrong & score & info;
-		}
 };
 
 class ControleScript

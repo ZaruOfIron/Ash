@@ -4,6 +4,7 @@
 #include "controle_window.hpp"
 #include <boost/serialization/map.hpp>
 #include <boost/archive/text_oarchive.hpp>
+#include <boost/archive/text_iarchive.hpp>
 #include <cassert>
 #include <map>
 
@@ -128,7 +129,7 @@ void LuaControleScript::restoreSaveData(std::istream& is)
 	auto L = lua_.get();
 
 	std::map<std::string, int> data;
-	boost::archive::test_iarchive ia(is);
+	boost::archive::text_iarchive ia(is);
 	ia >> data;
 
 	for(auto it = data.begin();it != data.end();it++){

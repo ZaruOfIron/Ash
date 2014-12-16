@@ -1,13 +1,27 @@
 #include "ash.hpp"
 #include "lua_controle_script.hpp"
 #include "copydata_view.hpp"
+#include <boost/archive/text_oarchive.hpp>
+#include <boost/archive/text_iarchive.hpp>
+#include <boost/date_time.hpp>
+#include <boost/format.hpp>
+#include <sstream>
 
 //#include <iostream>
 
-Ash::Ash()
-	: users_(), controler_(), view_(new CopyDataView("AUAUA"))
+std::string getDateTimeString()
 {
+	auto f = new boost::posix_time::time_facet("%y%m%d_%H%M%S");
+	std::ostringstream oss;
+	oss.imbue(std::locale(oss.getloc(), f));
+	oss << boost::posix_time::second_clock::local_time();
+	return oss.str();
 }
+
+Ash::Ash()
+	: users_(), controler_(), view_(new CopyDataView("AUAUA")),
+	saveFileName_((boost::format("%1%.log") % getDateTimeString()).str())
+{}
 
 void Ash::setScript(const std::string& filename)
 {
@@ -18,6 +32,22 @@ void Ash::setScript(const std::string& filename)
 void Ash::run()
 {
 	controler_->run();
+}
+
+void Ash::undo()
+{
+	std::istringstream iss(saves_.back());	saves_.pop_back();
+	boost::archive::text_iarchive ia(iss);
+	SaveData data;	ia >> data;
+	blankData_.at(data.index) = data;
+
+	users_.at(data.index) = data.user;
+
+	view_->sendUserModified(data.index, data.user, data.modIndex);
+	for(int id : data.info)	view_->sendInfo(id);
+
+	iss.str(data.luaVars);	iss.clear(std::istringstream::goodbit);
+	controler_->restoreSaveData(iss);
 }
 
 const User& Ash::getUser(int index) const
@@ -34,6 +64,7 @@ void Ash::luaInitialize(int answer, int winner, const std::string& title, const 
 {
 	winner_ = winner;
 	users_.resize(answer, orgUser);
+	blankData_.resize(answer);
 
 	view_->initialize(answer, winner, title, subtitle, quizId);
 
@@ -58,7 +89,22 @@ void Ash::luaUpdate(const UserUpdateMessage& msg)
 	if(user.status != User::STATUS::FIGHTER)	// ‘ÎÛŠO
 		return;
 
-	int modIndex = 0;
+	// •Û‘¶ˆ—
+	SaveData& data = blankData_.at(msg.index);
+	if(data.index != -1){
+		std::ostringstream oss;	controler_->getSaveData(oss);
+		data.luaVars = oss.str();
+
+		oss.str("");
+		boost::archive::text_oarchive oa(oss);
+		oa << data;
+		saves_.push_back(oss.str());
+	}
+	else	data.index = msg.index;
+
+	// •ÏX‚µ‚Ä‚¢‚­
+	int& modIndex = data.modIndex;
+	modIndex = 0;
 	if(msg.name){
 		user.name = *(msg.name);
 		modIndex |= 1 << 0;
@@ -78,11 +124,13 @@ void Ash::luaUpdate(const UserUpdateMessage& msg)
 
 	view_->sendUserModified(msg.index, user, modIndex);
 
+	data.info.clear();
 	for(int id : msg.info){
 		// Ÿ‚¿”²‚¯(1)‚Æ”s‘Þ(2)‚Í‹L˜^‚µ‚Ä‚¨‚­
 		if(id == 1)	user.status = User::STATUS::WINNER;
 		else if(id == 2)	user.status = User::STATUS::LOSER;
 
+		data.info.push_back(id);
 		view_->sendInfo(id);
 	}
 
