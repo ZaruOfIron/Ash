@@ -99,6 +99,9 @@ void LuaControleScript::onUserButton(int index, int id)
 {
 	auto L = lua_.get();
 
+	// I‚í‚Á‚Ä‚¢‚ê‚Î‰Ÿ‚³‚ê‚Ä‚à‰½‚à‚µ‚È‚¢
+	if(ash_.hasFinished())	return;
+
 	// ‘ÎÛŠO‚Å‚ ‚ê‚ÎŒÄ‚Î‚È‚¢
 	if(ash_.getUser(index - 1).status != User::STATUS::FIGHTER)
 		return;
@@ -116,6 +119,9 @@ void LuaControleScript::onUserButton(int index, int id)
 void LuaControleScript::onSystemButton(int id)
 {
 	auto L = lua_.get();
+	
+	// I‚í‚Á‚Ä‚¢‚ê‚Î‰Ÿ‚³‚ê‚Ä‚à‰½‚à‚µ‚È‚¢
+	if(ash_.hasFinished())	return;
 
 	// ŠÖ”‚ğÏ‚Ş
 	lua_getglobal(L, "on_system_button");
