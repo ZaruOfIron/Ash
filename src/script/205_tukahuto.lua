@@ -25,7 +25,7 @@ function initialize()
 	}
 end
 
-function on_command(index, id)
+function on_user_button(index, id)
 	local user, data, info = ash.get_user(index), {}, {}
 
 	if id == 1 then	-- correct

@@ -30,46 +30,46 @@ function initialize()
 	}
 end
 
-function on_command(index, id)
-	if index == 0 then	-- system
-		if id == 1 then	-- finish
-			local users = ash_helper.get_all_users(ANSWER)
-			ash_helper.sort_users(users)
-			for i = 1, WINNER do
-				ash.set_user(users[i].index, {}, {1})
-			end
+function on_system_button(id)
+	if id == 1 then	-- finish
+		local users = ash_helper.get_all_users(ANSWER)
+		ash_helper.sort_users(users)
+		for i = 1, WINNER do
+			ash.set_user(users[i].index, {}, {1})
 		end
-	else	-- user
-		local user, data = ash.get_user(index), {}
+	end
+end
 
-		if id == 1 then -- charge
-			if charge_count[index] == nil then charge_count[index] = 0 end
-			if charge_count[index] >= CHARGE_COUNT_LIMIT then return end
-			charge_count[index] = charge_count[index] + 1
+function on_user_button(index, id)
+	local user, data = ash.get_user(index), {}
 
-			data.correct = user.correct + 1
-			data.score = user.score + 2
-			if data.score >= LIMIT_SCORE then data.score = LIMIT_SCORE end
-		elseif id == 2 then	-- attack
-			data.correct = user.correct + 1
+	if id == 1 then -- charge
+		if charge_count[index] == nil then charge_count[index] = 0 end
+		if charge_count[index] >= CHARGE_COUNT_LIMIT then return end
+		charge_count[index] = charge_count[index] + 1
 
-			-- 全てのユーザーの得点を-1
-			-- ただし、indexと等しいまたはget_userでnilが返ってきた場合を除く
-			-- continue文がないためにifが数珠繋ぎになっている
-			for i = 1, ANSWER do
-				if i ~= index then
-					local user = ash.get_user(i)
-					if user ~= nil then
-						ash.set_user(i, { score = user.score - 1 })
-					end
+		data.correct = user.correct + 1
+		data.score = user.score + 2
+		if data.score >= LIMIT_SCORE then data.score = LIMIT_SCORE end
+	elseif id == 2 then	-- attack
+		data.correct = user.correct + 1
+
+		-- 全てのユーザーの得点を-1
+		-- ただし、indexと等しいまたはget_userでnilが返ってきた場合を除く
+		-- continue文がないためにifが数珠繋ぎになっている
+		for i = 1, ANSWER do
+			if i ~= index then
+				local user = ash.get_user(i)
+				if user ~= nil then
+					ash.set_user(i, { score = user.score - 1 })
 				end
 			end
-		elseif id == 3 then	-- wrong
-			data.wrong = user.wrong + 1
-			data.score = user.score - 2
 		end
-
-		ash.set_user(index, data)
+	elseif id == 3 then	-- wrong
+		data.wrong = user.wrong + 1
+		data.score = user.score - 2
 	end
+
+	ash.set_user(index, data)
 end
 
