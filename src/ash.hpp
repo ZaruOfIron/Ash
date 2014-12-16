@@ -6,8 +6,9 @@
 #include "view.hpp"
 #include <memory>
 #include <vector>
+#include <wincore.h>
 
-class Ash
+class Ash : private CWinApp
 {
 private:
 	std::vector<User> users_;

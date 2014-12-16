@@ -17,6 +17,7 @@ void Ash::setScript(const std::string& filename)
 
 void Ash::run()
 {
+	Run();
 }
 
 const User& Ash::getUser(int index) const
