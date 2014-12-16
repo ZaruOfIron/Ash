@@ -5,6 +5,7 @@
 #include <lua.hpp>
 #include <memory>
 #include <string>
+#include <vector>
 
 class Ash;
 class ControleWindowFrame;
@@ -18,6 +19,7 @@ private:
 	Ash& ash_;
 	static LuaControleScript *thisPtr_;
 	int answer_;
+	std::vector<std::string> trackingVars_;
 
 	static bool checkboolean(lua_State *L, int index);
 
@@ -27,6 +29,7 @@ private:
 	static int luaCreateSystemButton(lua_State *L);
 	static int luaSetUserButtonState(lua_State *L);
 	static int luaSetSystemButtonState(lua_State *L);
+	static int luaAddTrackingVar(lua_State *L);
 
 public:
 	LuaControleScript(Ash& ash, const std::string& filename);

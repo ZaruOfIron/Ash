@@ -45,6 +45,7 @@ void LuaControleScript::initialize()
 	static const luaL_Reg ash_config[] = {
 		{ "create_user_button", &LuaControleScript::luaCreateUserButton },
 		{ "create_system_button", &LuaControleScript::luaCreateSystemButton },
+		{ "add_tracking_var", &LuaControleScript::luaAddTrackingVar },
 		{ NULL, NULL }
 	};
 
@@ -221,5 +222,10 @@ int LuaControleScript::luaSetUserButtonState(lua_State *L)
 int LuaControleScript::luaSetSystemButtonState(lua_State *L)
 {
 	thisPtr_->window_->setSystemButtonState(luaL_checkint(L, 1), checkboolean(L, 2));
+}
+
+int LuaControleScript::luaAddTrackingVar(lua_State *L)
+{
+	thisPtr_->trackingVars_.push_back(luaL_checkstring(L, 1));
 }
 
