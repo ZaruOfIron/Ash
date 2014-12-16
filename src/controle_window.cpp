@@ -128,11 +128,12 @@ BOOL ControleWindow::OnCommand(WPARAM wParam, LPARAM lParam)
 	if(id == 0){	// Edit
 		//if(HIWORD(wParam) == EN_UPDATE){
 		if(HIWORD(wParam) == EN_KILLFOCUS){
-			frame_->controler_->onCommand(index, std::string(GetDlgItem(num)->GetWindowText()));
+			frame_->controler_->onName(index, std::string(GetDlgItem(num)->GetWindowText()));
 		}
 	}
 	else{
-		frame_->controler_->onCommand(index, id);
+		if(index == 0)	frame_->controler_->onSystemButton(id);
+		else	frame_->controler_->onUserButton(index, id);
 	}
 
 	return TRUE;

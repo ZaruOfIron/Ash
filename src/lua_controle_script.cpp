@@ -95,17 +95,16 @@ void LuaControleScript::run()
 	window_->run(answer_);
 }
 
-void LuaControleScript::onCommand(int index, int id)
+void LuaControleScript::onUserButton(int index, int id)
 {
 	auto L = lua_.get();
 
 	// 対象外であれば呼ばない
-	if(index != 0 && ash_.getUser(index - 1).status != User::STATUS::FIGHTER)
+	if(ash_.getUser(index - 1).status != User::STATUS::FIGHTER)
 		return;
 
-	// on_command()を呼び出す
 	// 関数を積む
-	lua_getglobal(L, "on_command");
+	lua_getglobal(L, "on_user_button");
 	// 引数を積む
 	lua_pushnumber(L, index);
 	lua_pushnumber(L, id);
@@ -114,7 +113,20 @@ void LuaControleScript::onCommand(int index, int id)
 	if(lua_pcall(L, 2, 0, 0))	throw LuaCantCallFuncError(luaL_checkstring(L, -1));
 }
 
-void LuaControleScript::onCommand(int index, const std::string& name)
+void LuaControleScript::onSystemButton(int id)
+{
+	auto L = lua_.get();
+
+	// 関数を積む
+	lua_getglobal(L, "on_system_button");
+	// 引数を積む
+	lua_pushnumber(L, id);
+	// 呼び出す
+	// lua_pcall(L, 引数, 戻り値, ?)
+	if(lua_pcall(L, 1, 0, 0))	throw LuaCantCallFuncError(luaL_checkstring(L, -1));
+}
+
+void LuaControleScript::onName(int index, const std::string& name)
 {
 	UserUpdateMessage msg;
 	msg.index = index - 1;

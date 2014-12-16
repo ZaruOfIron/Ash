@@ -35,9 +35,9 @@ public:
 	void initialize();
 	void run();
 
-	void onCommand(int index, int id);
-	void onCommand(int index, const std::string& name);	// name
-
+	void onUserButton(int index, int id);
+	void onSystemButton(int id);
+	void onName(int index, const std::string& name);
 };
 
 #endif
