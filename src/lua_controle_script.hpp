@@ -19,10 +19,14 @@ private:
 	static LuaControleScript *thisPtr_;
 	int answer_;
 
+	static bool checkboolean(lua_State *L, int index);
+
 	static int luaGetUser(lua_State *L);
 	static int luaSetUser(lua_State *L);
 	static int luaCreateUserButton(lua_State *L);
 	static int luaCreateSystemButton(lua_State *L);
+	static int luaSetUserButtonState(lua_State *L);
+	static int luaSetSystemButtonState(lua_State *L);
 
 public:
 	LuaControleScript(Ash& ash, const std::string& filename);

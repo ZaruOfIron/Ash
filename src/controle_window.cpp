@@ -15,6 +15,16 @@ void ControleWindowFrame::registerSystemButton(const ButtonData& data)
 	systemForm_.push_back(data);
 }
 
+void ControleWindowFrame::setUserButtonState(int index, int id, bool hasEnabled)
+{
+	window_->setButtonState(index, id, hasEnabled);
+}
+
+void ControleWindowFrame::setSystemButtonState(int id, bool hasEnabled)
+{
+	setUserButtonState(0, id, hasEnabled);
+}
+
 int ControleWindowFrame::run(int answer)
 {
 	window_.reset(new ControleWindow(this, answer));
@@ -25,6 +35,11 @@ int ControleWindowFrame::run(int answer)
 ControleWindow::ControleWindow(ControleWindowFrame *frame, int answer)
 	: frame_(frame), answer_(answer)
 {}
+
+void ControleWindow::setButtonState(int index, int id, bool hasEnabled)
+{
+	::EnableWindow(GetDlgItem((index << 8) | id)->GetHwnd(), hasEnabled);
+}
 
 void ControleWindow::setClientSize(int width, int height)
 {
@@ -49,7 +64,7 @@ void ControleWindow::OnCreate()
 		if(scrWidth < rect.right + 10)	scrWidth = rect.right + 10;
 		if(scrHeight < rect.bottom + 10)	scrHeight = rect.bottom + 10;
 
-		int id = i + 1;
+		int index = i + 1;
 
 		::CreateWindowEx(
 			0,
@@ -57,7 +72,7 @@ void ControleWindow::OnCreate()
 			"",
 			WS_CHILD | WS_VISIBLE | WS_TABSTOP | WS_BORDER | ES_LEFT,
 			rect.left, rect.top, rect.Width(), FORM_PART_HEIGHT,
-			GetHwnd(), reinterpret_cast<HMENU>(id << 8),
+			GetHwnd(), reinterpret_cast<HMENU>(index << 8),
 			::GetModuleHandle(NULL), NULL);
 
 		for(int j = 0;j < frame_->userForm_.size();j++){
@@ -70,7 +85,7 @@ void ControleWindow::OnCreate()
 				WS_CHILD | WS_VISIBLE | WS_TABSTOP | BS_PUSHBUTTON,
 				x, y, rect.Width(), FORM_PART_HEIGHT,
 				GetHwnd(),
-				reinterpret_cast<HMENU>(id << 8 | part.id),
+				reinterpret_cast<HMENU>(index << 8 | part.id),
 				::GetModuleHandle(NULL), NULL);
 		}
 	}

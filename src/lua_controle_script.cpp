@@ -38,6 +38,8 @@ void LuaControleScript::initialize()
 	static const luaL_Reg ash[] = {
 		{ "get_user", &LuaControleScript::luaGetUser },
 		{ "set_user", &LuaControleScript::luaSetUser },
+		{ "set_user_button_state", &LuaControleScript::luaSetUserButtonState },
+		{ "set_system_button_state", &LuaControleScript::luaSetSystemButtonState },
 		{ NULL, NULL }
 	};
 	static const luaL_Reg ash_config[] = {
@@ -121,6 +123,12 @@ void LuaControleScript::onCommand(int index, const std::string& name)
 	thisPtr_->ash_.luaUpdate(msg);
 }
 
+bool LuaControleScript::checkboolean(lua_State *L, int index)
+{
+	assert(lua_isboolean(L, index));
+	return lua_toboolean(L, index);
+}
+
 int LuaControleScript::luaGetUser(lua_State *L)
 {
 	int index = luaL_checkint(L, -1);
@@ -185,5 +193,15 @@ int LuaControleScript::luaCreateUserButton(lua_State *L)
 int LuaControleScript::luaCreateSystemButton(lua_State *L)
 {
 	thisPtr_->window_->registerSystemButton(ButtonData(luaL_checkint(L, 1), luaL_checkstring(L, 2)));
+}
+
+int LuaControleScript::luaSetUserButtonState(lua_State *L)
+{
+	thisPtr_->window_->setUserButtonState(luaL_checkint(L, 1), luaL_checkint(L, 2), checkboolean(L, 3));
+}
+
+int LuaControleScript::luaSetSystemButtonState(lua_State *L)
+{
+	thisPtr_->window_->setSystemButtonState(luaL_checkint(L, 1), checkboolean(L, 2));
 }
 

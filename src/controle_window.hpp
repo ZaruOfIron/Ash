@@ -32,6 +32,9 @@ public:
 
 	void registerUserButton(const ButtonData& data);
 	void registerSystemButton(const ButtonData& data);
+
+	void setUserButtonState(int index, int id, bool hasEnabled);
+	void setSystemButtonState(int id, bool hasEnabled);
 	
 	int run(int answer);
 };
@@ -57,6 +60,8 @@ private:
 
 public:
 	ControleWindow(ControleWindowFrame *frame, int answer);
+
+	void setButtonState(int index, int id, bool hasEnabled);
 	
 	LRESULT WndProc(UINT uMsg, WPARAM wParam, LPARAM lParam);
 };
