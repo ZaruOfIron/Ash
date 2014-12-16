@@ -1,4 +1,5 @@
 #include "log_window.hpp"
+#include "resource.h"
 
 BOOL LogWindow::OnInitDialog()
 {

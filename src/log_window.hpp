@@ -3,6 +3,9 @@
 #define ___LOG_WINDOW_HPP___
 
 #include <wincore.h>
+#include <controls.h>
+#include <stdcontrols.h>
+#include <dialog.h>
 
 class LogWindow : public CDialog
 {
@@ -11,8 +14,8 @@ private:
 	BOOL OnInitDialog();
 	BOOL OnCommand(WPARAM wParam, LPARAM lParam);
 public:
-	LogWindow(UINT nResID, CWnd *pParent = NULL)
-		: CDialog(nResID, pParent)
+	LogWindow(UINT nResID)
+		: CDialog(nResID)
 	{}
 	
 	void write(const std::string& msg);
