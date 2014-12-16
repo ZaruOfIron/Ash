@@ -1,14 +1,14 @@
+require('ash_helper')
+
 ANSWER = 11
 WINNER = 3
 
 function initialize()
 	-- create user buttons
-	ash.config.create_user_button(1, 'CORRECT')
-	ash.config.create_user_button(2, 'しりとり')
-	ash.config.create_user_button(3, 'WRONG')
+	ash_helper.create_user_buttons('CORRECT', 'しりとり', 'WRONG')
 
 	-- create system buttons	
-	ash.config.create_system_button(1, 'FINISH')
+	ash_helper.create_system_buttons('FINISH')
 
 	-- return info
 	return {
@@ -28,23 +28,8 @@ end
 function on_command(index, id)
 	if index == 0 then	-- system
 		if id == 1 then	-- finish
-			-- userを全部取得する
-			local users = {}
-			for i = 1, ANSWER do
-				table.insert(users, ash.get_user(i))
-			end
-			
-			-- クイズの規則に従ってソート
-			-- scoreが高く、正答数が多く、誤答数が少なく、indexが小さいほう
-			table.sort(users,
-				function(a, b)
-					if a.score ~= b.score then return a.score > b.score end
-					if a.correct ~= b.correct then return a.correct > b.correct end
-					if a.wrong ~= b.wrong then return a.wrong < b.wrong end
-					return a.index < b.index
-				end)
-
-			-- うえからWINNER個は通過
+			local users = ash_helper.get_all_users(ANSWER)
+			ash_helper.sort_users(users)
 			for i = 1, WINNER do
 				ash.set_user(users[i].index, {}, {1})
 			end

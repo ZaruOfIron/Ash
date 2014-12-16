@@ -1,3 +1,5 @@
+require('ash_helper')
+
 ANSWER = 11
 WINNER = 3
 CORRECT_LIMIT = 6
@@ -6,8 +8,7 @@ suc_correct, suc_wrong = {}, {}
 
 function initialize()
 	-- create user buttons
-	ash.config.create_user_button(1, 'CORRECT')
-	ash.config.create_user_button(2, 'WRONG')
+	ash_helper.create_user_buttons('CORRECT', 'WRONG')
 
 	-- create system buttons	
 

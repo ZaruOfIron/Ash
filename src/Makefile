@@ -5,7 +5,7 @@ CPPS=main.cpp lua_controle_script.cpp ash.cpp controle_window.cpp copydata_view.
 OBJS=$(CPPS:.cpp=.o)
 
 ash: $(OBJS)
-	g++ -o ash $(OBJS) $(LIBRARY) -lcomctl32 -lgdi32 -llua52
+	g++ -o ash $(OBJS) $(LIBRARY) -lcomctl32 -lgdi32 -llua52 -static-libgcc -static-libstdc++
 
 .cpp.o:
 	g++ $(CXXFLAGS) $(INCLUDE) -c $< -o $(<:.cpp=.o)

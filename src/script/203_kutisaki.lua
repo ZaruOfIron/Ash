@@ -1,25 +1,17 @@
+require('ash_helper')
+
 ANSWER = 10
 WINNER = 4
 add_score = 0
 
 function initialize()
 	-- create user buttons
-	ash.config.create_user_button(1, 'CORRECT')
-	ash.config.create_user_button(2, 'WRONG')
+	ash_helper.create_user_buttons('CORRECT', 'WRONG')
 
 	-- create system buttons	
-	ash.config.create_system_button(1, '1')
-	ash.config.create_system_button(2, '2')
-	ash.config.create_system_button(3, '3')
-	ash.config.create_system_button(4, '4')
-	ash.config.create_system_button(5, '5')
-	ash.config.create_system_button(6, '6')
-	ash.config.create_system_button(7, '7')
-	ash.config.create_system_button(8, '8')
-	ash.config.create_system_button(9, '9')
-	ash.config.create_system_button(10, '0')
-	ash.config.create_system_button(11, 'CLEAR')
-	ash.config.create_system_button(12, 'FINISH')
+	ash_helper.create_system_buttons(
+		'1', '2', '3', '4', '5', '6', '7', '8', '9', '0', 'CLEAR', 'FINISH'
+	)
 
 	-- return info
 	return {
@@ -43,29 +35,14 @@ function on_command(index, id)
 		elseif id == 11 then	-- clear
 			add_score = 0
 		elseif id == 12 then	-- finish
-			-- userを全部取得する
-			local users = {}
-			for i = 1, ANSWER do
-				table.insert(users, ash.get_user(i))
-			end
-			
-			-- クイズの規則に従ってソート
-			-- scoreが高く、正答数が多く、誤答数が少なく、indexが小さいほう
-			table.sort(users,
-				function(a, b)
-					if a.score ~= b.score then return a.score > b.score end
-					if a.correct ~= b.correct then return a.correct > b.correct end
-					if a.wrong ~= b.wrong then return a.wrong < b.wrong end
-					return a.index < b.index
-				end)
-
-			-- うえからWINNER個は通過
+			local users = ash_helper.get_all_users(ANSWER)
+			ash_helper.sort_users(users)
 			for i = 1, WINNER do
 				ash.set_user(users[i].index, {}, {1})
 			end
 		end
 	else	-- user
-		local user, data, info = ash.get_user(index), {}, {}
+		local user, data = ash.get_user(index), {}
 
 		if id == 1 then	-- correct
 			data.correct = user.correct + 1
@@ -75,7 +52,7 @@ function on_command(index, id)
 			data.score = user.score - add_score
 		end
 
-		ash.set_user(index, data, info)
+		ash.set_user(index, data)
 		add_score = 0
 	end
 end

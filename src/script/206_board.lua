@@ -1,23 +1,16 @@
+require('ash_helper')
+
 ANSWER = 10
 WINNER = 4
 
 checked_users = {}
 
-function search_array(array, target)
-	for idx, value in pairs(array) do
-		if value == target then return idx end
-	end
-	return nil
-end
-
 function initialize()
 	-- create user buttons
-	ash.config.create_user_button(1, 'CHECK')
+	ash_helper.create_user_buttons('CHECK')
 
-	-- create system buttons	
-	ash.config.create_system_button(1, 'SUBMIT')
-	ash.config.create_system_button(2, 'CLEAR')
-	ash.config.create_system_button(3, 'FINISH')
+	-- create system buttons
+	ash_helper.create_system_buttons('SUBMIT', 'CLEAR', 'FINISH')
 
 	-- return info
 	return {
@@ -37,6 +30,7 @@ end
 function on_command(index, id)
 	if index == 0 then	-- system
 		if id == 1 then	-- submit
+			-- 追加点を決定
 			local user_count = table.maxn(checked_users)
 			local add_score = 0
 			if user_count == 1 then add_score = 3
@@ -45,7 +39,7 @@ function on_command(index, id)
 
 			for i = 1, ANSWER do
 				local user = ash.get_user(i)
-				if search_array(checked_users, i) then	-- correct
+				if ash_helper.search_array(checked_users, i) then	-- correct
 					ash.set_user(i, { correct = user.correct + 1, score = user.score + add_score })
 				else	-- wrong
 					ash.set_user(i, { wrong = user.wrong + 1 })
@@ -56,23 +50,8 @@ function on_command(index, id)
 		elseif id == 2 then	-- clear
 			checked_users = {}
 		elseif id == 3 then	-- finish
-			-- userを全部取得する
-			local users = {}
-			for i = 1, ANSWER do
-				table.insert(users, ash.get_user(i))
-			end
-			
-			-- クイズの規則に従ってソート
-			-- scoreが高く、正答数が多く、誤答数が少なく、indexが小さいほう
-			table.sort(users,
-				function(a, b)
-					if a.score ~= b.score then return a.score > b.score end
-					if a.correct ~= b.correct then return a.correct > b.correct end
-					if a.wrong ~= b.wrong then return a.wrong < b.wrong end
-					return a.index < b.index
-				end)
-
-			-- うえからWINNER個は通過
+			local users = ash_helper.get_all_users(ANSWER)
+			ash_helper.sort_users(users)
 			for i = 1, WINNER do
 				ash.set_user(users[i].index, {}, {1})
 			end
