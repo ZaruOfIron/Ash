@@ -2,13 +2,16 @@ CXXFLAGS=-U__STRICT_ANSI__ -D_WIN32_IE=0x0500 -D_WIN32_WINNT=0x0501 -DWINVER=0x0
 INCLUDE=-I../../../libraries/win32pp -I../../../libraries/lua52 -I../../../libraries/boost_1_57_0/include
 LIBRARY=-L../../../libraries/lua52 -L../../../libraries/boost_1_57_0/lib
 CPPS=main.cpp lua_controle_script.cpp ash.cpp controle_window.cpp copydata_view.cpp
-OBJS=$(CPPS:.cpp=.o)
+OBJS=$(CPPS:.cpp=.o) ash.coff
 
 ash: $(OBJS)
 	g++ -o ash $(OBJS) $(LIBRARY) -lcomctl32 -lgdi32 -llua52 -static-libgcc -static-libstdc++
 
 .cpp.o:
 	g++ $(CXXFLAGS) $(INCLUDE) -c $< -o $(<:.cpp=.o)
+
+ash.coff: ash.rc
+	windres ash.rc ash.coff
 
 clean:
 	@rm $(OBJS)
