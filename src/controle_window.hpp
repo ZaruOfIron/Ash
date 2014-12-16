@@ -18,31 +18,11 @@ struct ButtonData
 		: id(id_), caption(caption_){}
 };
 
-class ControleWindowFrame : private CWinApp
-{
-private:
-	LuaControleScript *controler_;
-	std::unique_ptr<ControleWindow> window_;
-	std::vector<ButtonData> userForm_, systemForm_;
-
-public:
-	friend ControleWindow;
-
-	ControleWindowFrame(LuaControleScript *controler);
-
-	void registerUserButton(const ButtonData& data);
-	void registerSystemButton(const ButtonData& data);
-
-	void setUserButtonState(int index, int id, bool hasEnabled);
-	void setSystemButtonState(int id, bool hasEnabled);
-	
-	int run(int answer);
-};
-
 class ControleWindow : public CWnd
 {
 private:
-	ControleWindowFrame *frame_;
+	LuaControleScript *controler_;
+	std::vector<ButtonData> userForm_, systemForm_;
 	int answer_;
 
 	enum {
@@ -59,10 +39,16 @@ private:
 	BOOL OnCommand(WPARAM wParam, LPARAM lParam);
 
 public:
-	ControleWindow(ControleWindowFrame *frame, int answer);
+	ControleWindow(LuaControleScript *controler);
 
-	void setButtonState(int index, int id, bool hasEnabled);
-	
+	void setAnswer(int answer);
+
+	void registerUserButton(const ButtonData& data);
+	void registerSystemButton(const ButtonData& data);
+
+	void setUserButtonState(int index, int id, bool hasEnabled);
+	void setSystemButtonState(int id, bool hasEnabled);
+
 	LRESULT WndProc(UINT uMsg, WPARAM wParam, LPARAM lParam);
 };
 

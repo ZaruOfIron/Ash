@@ -32,7 +32,7 @@ void LuaControleScript::initialize()
 {
 	auto L = lua_.get();
 
-	window_.reset(new ControleWindowFrame(this));
+	window_.reset(new ControleWindow(this));
 
 	// api‚ðÝ’è
 	static const luaL_Reg ash[] = {
@@ -88,11 +88,9 @@ void LuaControleScript::initialize()
 	lua_setglobal(L, "ash");
 
 	ash_.luaInitialize(answer_, winner, title, subtitle, quizId, orgUser);
-}
 
-void LuaControleScript::run()
-{
-	window_->run(answer_);
+	window_->setAnswer(answer_);
+	window_->Create();
 }
 
 void LuaControleScript::onUserButton(int index, int id)

@@ -7,13 +7,13 @@
 #include <string>
 
 class Ash;
-class ControleWindowFrame;
+class ControleWindow;
 
 class LuaControleScript : public ControleScript
 {
 private:
 	std::unique_ptr<lua_State, decltype(&lua_close)> lua_;
-	std::unique_ptr<ControleWindowFrame> window_;
+	std::unique_ptr<ControleWindow> window_;
 	std::string filename_;
 	Ash& ash_;
 	static LuaControleScript *thisPtr_;
@@ -33,7 +33,6 @@ public:
 	~LuaControleScript();
 	
 	void initialize();
-	void run();
 
 	void onUserButton(int index, int id);
 	void onSystemButton(int id);
