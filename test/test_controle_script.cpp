@@ -58,7 +58,7 @@ BOOST_AUTO_TEST_CASE( create_user_button )
 	BOOST_CHECK_NO_THROW(controle.initialize());
 	BOOST_CHECK_NO_THROW(controle.onCommand(1, 1));
 	std::cout << "Check from create_user_button" << std::endl;
-	controle.run();
+	//controle.run();
 }
 
 BOOST_AUTO_TEST_CASE( create_system_button )
@@ -68,6 +68,23 @@ BOOST_AUTO_TEST_CASE( create_system_button )
 	BOOST_CHECK_NO_THROW(controle.initialize());
 	BOOST_CHECK_NO_THROW(controle.onCommand(1, 1));
 	std::cout << "Check from create_system_button" << std::endl;
+	//controle.run();
+}
+
+BOOST_AUTO_TEST_CASE( set_user_button_state )
+{
+	Ash ash;
+	LuaControleScript controle(ash, "script/set_user_button_state.lua");
+	BOOST_CHECK_NO_THROW(controle.initialize());
+	std::cout << "Check from set_user_button_state" << std::endl;
 	controle.run();
 }
 
+BOOST_AUTO_TEST_CASE( set_system_button_state )
+{
+	Ash ash;
+	LuaControleScript controle(ash, "script/set_system_button_state.lua");
+	BOOST_CHECK_NO_THROW(controle.initialize());
+	std::cout << "Check from set_system_button_state" << std::endl;
+	controle.run();
+}
