@@ -123,6 +123,20 @@ void LuaControleScript::getSaveData(std::ostream& os)
 	oa << data;
 }
 
+void LuaControleScript::restoreSaveData(std::istream& is)
+{
+	auto L = lua_.get();
+
+	std::map<std::string, int> data;
+	boost::archive::test_iarchive ia(is);
+	ia >> data;
+
+	for(auto it = data.begin();it != data.end();it++){
+		lua_pushnumber(L, it->second);
+		lua_setglobal(L, it->first.c_str());
+	}
+}
+
 void LuaControleScript::onUserButton(int index, int id)
 {
 	auto L = lua_.get();

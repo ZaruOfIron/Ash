@@ -32,6 +32,7 @@ public:
 	virtual void initialize() = 0;
 	virtual void run() = 0;
 	virtual void getSaveData(std::ostream& os) = 0;
+	virtual void restoreSaveData(std::istream& is) = 0;
 };
 
 

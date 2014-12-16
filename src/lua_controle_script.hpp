@@ -38,6 +38,7 @@ public:
 	void initialize();
 	void run();
 	void getSaveData(std::ostream& os);
+	void restoreSaveData(std::istream& is);
 
 	void onUserButton(int index, int id);
 	void onSystemButton(int id);
