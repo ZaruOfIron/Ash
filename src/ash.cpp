@@ -20,9 +20,14 @@ void Ash::run()
 	controler_->run();
 }
 
-const User& Ash::getUser(int index)
+const User& Ash::getUser(int index) const
 {
 	return users_.at(index);
+}
+
+bool Ash::hasFinished() const
+{
+	return getFinishStatus() != FINISH_STATUS::FIGHTING;
 }
 
 void Ash::luaInitialize(int answer, int winner, const std::string& title, const std::string& subtitle, int quizId, const User& orgUser)

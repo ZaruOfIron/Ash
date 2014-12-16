@@ -29,7 +29,8 @@ public:
 	void setScript(const std::string& filename);
 	void run();
 
-	const User& getUser(int index);
+	const User& getUser(int index) const;
+	bool hasFinished() const;
 
 	void luaInitialize(int answer, int winner, const std::string& title, const std::string& subtitle, int quizId, const User& orgUser);
 	void luaUpdate(const UserUpdateMessage& msg);
