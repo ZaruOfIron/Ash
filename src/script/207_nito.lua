@@ -18,11 +18,7 @@ function initialize()
 		title = '?th stage',
 		subtitle = '‚Q“š',
 		quizid = 207,
-		org_user = {
-			correct = 0,
-			wrong = 0,
-			score = 0
-		}
+		org_user = ash_helper.all_zero_user
 	}
 end
 

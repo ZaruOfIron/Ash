@@ -20,11 +20,7 @@ function initialize()
 		title = '?th stage',
 		subtitle = 'å˚êÊ',
 		quizid = 203,
-		org_user = {
-			correct = 0,
-			wrong = 0,
-			score = 0
-		}
+		org_user = ash_helper.all_zero_user
 	}
 end
 
@@ -34,11 +30,7 @@ function on_system_button(id)
 	elseif id == 11 then	-- clear
 		add_score = 0
 	elseif id == 12 then	-- finish
-		local users = ash_helper.get_all_users(ANSWER)
-		ash_helper.sort_users(users)
-		for i = 1, WINNER do
-			ash.set_user(users[i].index, {}, {1})
-		end
+		ash_helper.finish(ANSWER, WINNER)
 	end
 end
 

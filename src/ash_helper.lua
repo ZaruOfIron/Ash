@@ -1,5 +1,7 @@
 module('ash_helper', package.seeall)
 
+all_zero_user = { index = 0, correct = 0, wrong = 0, score = 0 }
+
 -- ˆø”‚Ì‡”Ô‚Ìindex‚ÅAuser button‚ğì¬‚·‚é
 function create_user_buttons(...)
 	captions = { ... }
@@ -45,5 +47,14 @@ function sort_users(users)
 			if a.wrong ~= b.wrong then return a.wrong < b.wrong end
 			return a.index < b.index
 		end)
+end
+
+-- Finish‚Ìˆ—
+function finish(answer, winner)
+	local users = ash_helper.get_all_users(answer)
+	ash_helper.sort_users(users)
+	for i = 1, winner do
+		ash.set_user(users[i].index, {}, {1})
+	end
 end
 
