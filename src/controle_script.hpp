@@ -2,7 +2,11 @@
 #define ___CONTROLE_SCRIPT_HPP___
 
 #include <boost/optional.hpp>
+#include <boost/serialization/string.hpp>
+#include <boost/serialization/vector.hpp>
+#include <boost/serialization/optional.hpp>
 #include <vector>
+#include <string>
 
 struct UserUpdateMessage
 {
@@ -10,6 +14,13 @@ struct UserUpdateMessage
 	boost::optional<std::string> name;
 	boost::optional<int> correct, wrong, score;
 	std::vector<int> info;
+
+	friend class boost::serialization::access;
+	template<class Archive>
+		void serialize(Archive& ar, const unsigned int version)
+		{
+			ar & index & name & correct & wrong & score & info;
+		}
 };
 
 class ControleScript
@@ -20,7 +31,7 @@ public:
 
 	virtual void initialize() = 0;
 	virtual void run() = 0;
-
+	virtual void getSaveData(std::ostream& os) = 0;
 };
 
 

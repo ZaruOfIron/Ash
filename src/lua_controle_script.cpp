@@ -2,7 +2,11 @@
 #include "lua_exception.hpp"
 #include "ash.hpp"
 #include "controle_window.hpp"
+#include <boost/serialization/map.hpp>
+#include <boost/archive/text_oarchive.hpp>
 #include <cassert>
+#include <map>
+
 
 LuaControleScript *LuaControleScript::thisPtr_ = nullptr;
 
@@ -94,6 +98,29 @@ void LuaControleScript::initialize()
 void LuaControleScript::run()
 {
 	window_->run(answer_);
+}
+
+void LuaControleScript::getSaveData(std::ostream& os)
+{
+	auto L = lua_.get();
+
+	std::map<std::string, int> data;	// intに決めうち
+	// グローバル変数の入ったテーブルを持ってくる
+	lua_rawgeti(L, LUA_REGISTRYINDEX, LUA_RIDX_GLOBALS);
+	lua_pushnil(L);
+	while(lua_next(L, -2)){
+		// -2: key, -1: value
+		// trackingVars_の中にある変数名だったら
+		auto it = std::find(trackingVars_.begin(), trackingVars_.end(), std::string(luaL_checkstring(L, -2)));
+		if(it != trackingVars_.end()){
+			data.insert(std::make_pair(*it, luaL_checkint(L, -1)));
+		}
+
+		lua_pop(L, 1);
+	}
+
+	boost::archive::text_oarchive oa(os);
+	oa << data;
 }
 
 void LuaControleScript::onUserButton(int index, int id)
