@@ -117,14 +117,21 @@ void LuaControleScript::restoreSaveData(std::istream& is)
 {
 	auto L = lua_.get();
 
-	std::map<std::string, int> data;
-	boost::archive::text_iarchive ia(is);
-	ia >> data;
+	is.seekg(0, std::ios_base::end);
+	int pos = is.tellg();
+	std::shared_ptr<char> buf(new char[pos + 1], std::default_delete<char[]>());
+	is.seekg(0, std::ios_base::beg);
+	is.read(buf.get(), pos);
+	buf.get()[pos] = '\0';
 
-	for(auto it = data.begin();it != data.end();it++){
-		lua_pushnumber(L, it->second);
-		lua_setglobal(L, it->first.c_str());
-	}
+	// ŠÖ”‚ğÏ‚Ş
+	lua_getglobal(L, "import_save_data");
+	// ˆø”‚ğÏ‚Ş
+	lua_pushstring(L, buf.get());
+	// ŒÄ‚Ño‚·
+	// lua_pcall(L, ˆø”, –ß‚è’l, ?)
+	if(lua_pcall(L, 1, 0, 0))	throw LuaCantCallFuncError(luaL_checkstring(L, -1));
+
 }
 
 void LuaControleScript::onUserButton(int index, int id)
