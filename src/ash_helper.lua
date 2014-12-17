@@ -58,3 +58,61 @@ function finish(answer, winner)
 	end
 end
 
+-- serialize
+function value2str(v)
+	local vt = type(v)
+
+	local conv_table = {
+		'nil' = function(v) return 'nil' end,
+		number = function(v) return string.format('%d', v) end,
+		string = function(v) return string.format('"%s"', v) end,
+		boolean = function(v) return (v == true and 'true' or 'false') end,
+		'function' = function(v) return '"*function"' end,
+		thread = function(v) return '"thread"' end,
+		userdata = function(v) return '"*userdata"' end
+	}
+
+	prod = conv_table[vt]
+	return prod == nil and '"UnsupportFormat"' or prod()
+end
+
+function field2str(v)
+	local vt = type(v)
+
+	local conv_table = {
+		number = function(v) return string.format('[%d]', v) end,
+		string = function(v) return string.format('%s', v) end
+	}
+
+	prod = conv_table[vt]
+	return prod == nil and 'UnknownField' or prod()
+end
+
+-- テーブルのシリアライズ
+function serialize_table(t)
+	if not (type(t) == 'table') then return value2str(t) end
+
+	local buf = ''
+	local f, v = next(t, nil)
+	while f do
+		-- ,を付加する
+		if buf ~= '' then buf = buf .. ',' end
+		-- 値
+		if type(v) == 'table' then
+			buf = buf .. field2str(f) .. '=' .. serialize(v)
+		else
+			buf = buf .. field2str(f) .. '=' .. value2str(v)
+		end
+		-- 次の要素
+		f, v = next(t, f)
+	end
+
+	buf = '{' .. buf .. '}'
+	return buf
+end
+
+-- デシリアライズ
+function deserialize(d)
+	return assert(loadstring('return ' .. d))()
+end
+
