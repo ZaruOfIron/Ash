@@ -3,7 +3,7 @@ require('ash_helper')
 ANSWER = 9
 WINNER = 1
 INITIAL_SCORE = 5
-LIMIT_SCORE = 7
+LIMIT_SCORE = 6
 CHARGE_COUNT_LIMIT = 3
 
 charge_count = {}
@@ -19,8 +19,8 @@ function initialize()
 	return {
 		answer = ANSWER,
 		winner = WINNER,
-		title = '?th stage',
-		subtitle = 'Big Wave',
+		title = '3rd Round 1st step',
+		subtitle = 'Final set Shangri-La Shower',
 		quizid = 204,
 		org_user = {
 			correct = 0,
@@ -32,7 +32,16 @@ end
 
 function on_system_button(id)
 	if id == 1 then	-- finish
-		ash_helper.finish(ANSWER, WINNER)
+		local users = ash_helper.get_all_users(ANSWER)
+		table.sort(users,
+			function(a, b)
+				if a.score ~= b.score then return a.score > b.score end
+				if a.correct ~= b.correct then return a.correct > b.correct end
+				return a.index < b.index
+			end)
+		for i = 1, WINNER do
+			ash.set_user(users[i].index, {}, {1})
+		end
 	end
 end
 
@@ -57,15 +66,26 @@ function on_user_button(index, id)
 			if i ~= index then
 				local user = ash.get_user(i)
 				if user ~= nil then
-					ash.set_user(i, { score = user.score - 1 })
+					local s = user.score - 1
+					if s <= 0 then
+						ash.set_user(i, { score = 0 }, {2})
+					else
+						ash.set_user(i, { score = s })
+					end
 				end
 			end
 		end
 	elseif id == 3 then	-- wrong
 		data.wrong = user.wrong + 1
 		data.score = user.score - 2
+
+		if data.score <= 0 then
+			data.score = 0
+			ash.set_user(index, data, {2})
+		end
 	end
 
+	
 	ash.set_user(index, data)
 end
 
