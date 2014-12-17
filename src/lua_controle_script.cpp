@@ -104,7 +104,7 @@ void LuaControleScript::getSaveData(std::ostream& os)
 	auto L = lua_.get();
 	
 	// ŠÖ”‚ğÏ‚Ş
-	lua_getglobal(L, "make_save_data");
+	lua_getglobal(L, "export_save_data");
 	// ˆø”‚ğÏ‚Ş
 	// ŒÄ‚Ño‚·
 	// lua_pcall(L, ˆø”, –ß‚è’l, ?)
