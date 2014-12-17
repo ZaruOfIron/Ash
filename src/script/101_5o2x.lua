@@ -10,17 +10,24 @@ function initialize()
 	-- create user buttons
 	ash_helper.create_user_buttons('CORRECT', 'WRONG')
 
-	-- create system buttons	
+	-- create system buttons
+	ash_helper.create_system_buttons('FINISH')
 
 	-- return info
 	return {
 		answer = ANSWER,
 		winner = WINNER,
-		title = '1st stage',
-		subtitle = '‚T›‚Q~',
+		title = '2nd Round —DŸ‚ğ–Úw‚µ‚Ä',
+		subtitle = '‚T›‚Q~˜A“š‚ ‚è',
 		quizid = 101,
 		org_user = ash_helper.all_zero_user
 	}
+end
+
+function on_system_button(id)
+	if id == 1 then	-- finish
+		ash_helper.finish(ANSWER, WINNER)
+	end
 end
 
 function on_user_button(index, id)
