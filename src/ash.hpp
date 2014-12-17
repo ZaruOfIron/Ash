@@ -42,6 +42,8 @@ private:
 
 	};
 	std::vector<PrevMsg> prevMsgs_;
+	int nowMsgOrder_;
+	std::vector<int> msgOrders_;
 
 	struct SaveData
 	{

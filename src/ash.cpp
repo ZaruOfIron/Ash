@@ -6,6 +6,8 @@
 #include <boost/archive/text_iarchive.hpp>
 #include <boost/date_time.hpp>
 #include <boost/format.hpp>
+#include <list>
+#include <utility>
 #include <sstream>
 
 //#include <iostream>
@@ -71,10 +73,16 @@ void Ash::undo()
 
 	prevMsgs_ = *(save.prevMsgs);
 	delete save.prevMsgs;	// newed by boost::serialization
-	for(int i = 0;i < prevMsgs_.size();i++){
-		auto& msg = prevMsgs_.at(i);
+	// ÉÅÉbÉZÅ[ÉWÇëóÇÈèáî‘ÇéZèoÇ∑ÇÈ
+	std::list<std::pair<int, int>> order;
+	for(int i = 0;i < msgOrders_.size();i++)	order.push_back(std::make_pair(i, msgOrders_.at(i)));
+	order.sort([](const std::pair<int, int>& lhs, const std::pair<int, int>& rhs) { return lhs.second < rhs.second; });
+	// èáî‘Ç«Ç®ÇËÇ…ëóÇ¡ÇƒÇ¢Ç≠
+	for(auto& item : order){
+		int index = item.first;
+		auto& msg = prevMsgs_.at(index);
 
-		view_->sendUserModified(i, msg.user, msg.modIndex);
+		view_->sendUserModified(index, msg.user, msg.modIndex);
 		for(int id : msg.info)	view_->sendInfo(id);
 	}
 
@@ -99,9 +107,11 @@ void Ash::luaInitialize(int answer, int winner, const std::string& title, const 
 
 	view_->initialize(answer, winner, title, subtitle, quizId);
 
+	nowMsgOrder_ = 0;
 	for(int i = 0;i < answer;i++){
 		view_->sendUserModified(i, orgUser, 0x0f);
 		prevMsgs_.push_back(PrevMsg(orgUser, 0x0f));
+		msgOrders_.at(i) = nowMsgOrder_++;
 	}
 }
 
@@ -175,6 +185,9 @@ void Ash::luaUpdate(const UserUpdateMessage& msg)
 			view_->sendInfo(1);
 		}
 	}
+
+	// èáî‘Çìoò^Ç∑ÇÈ
+	msgOrders_.at(msg.index) = nowMsgOrder_++;
 }
 
 Ash::FINISH_STATUS Ash::getFinishStatus() const
