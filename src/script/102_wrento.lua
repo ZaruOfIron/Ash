@@ -20,7 +20,7 @@ function initialize()
 		answer = ANSWER,
 		winner = WINNER,
 		title = '3rd Round 1st step',
-		subtitle = 'コースβ',
+		subtitle = 'コースβ Wonder zone',
 		quizid = 102,
 		org_user = ash_helper.all_zero_user
 	}
