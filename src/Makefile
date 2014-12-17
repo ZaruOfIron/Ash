@@ -10,6 +10,8 @@ ash: $(OBJS)
 .cpp.o:
 	g++ $(CXXFLAGS) $(INCLUDE) -c $< -o $(<:.cpp=.o)
 
+.PHONY: clean
 clean:
 	@rm $(OBJS)
+
 
