@@ -37,10 +37,10 @@ void CopyDataView::sendData(int id, const std::string& str)
 	*/
 }
 
-void CopyDataView::initialize(int answerNumber, int winnerNumber, const std::string& title, const std::string& subtitle, int quizId)
+void CopyDataView::initialize(int answerNumber, int winnerNumber, const std::string& title, const std::string& subtitle, int quizId, const User& orgUser)
 {
 	// Initialize Phase
-	sendData(101, (boost::format("%d,%d,%s,%s,%d") % answerNumber % winnerNumber % title.c_str() % subtitle.c_str() % quizId).str());
+	sendData(101, (boost::format("%d,%d,%s,%s,%d,%d,%d,%d") % answerNumber % winnerNumber % title.c_str() % subtitle.c_str() % quizId % orgUser.correct % orgUser.wrong % orgUser.score).str());
 }
 
 void CopyDataView::sendUserModified(int index, const User& user, int modIndex)

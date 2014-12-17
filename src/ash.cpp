@@ -37,7 +37,7 @@ void Ash::luaInitialize(int answer, int winner, const std::string& title, const 
 	winner_ = winner;
 	users_.resize(answer, orgUser);
 
-	view_->initialize(answer, winner, title, subtitle, quizId);
+	view_->initialize(answer, winner, title, subtitle, quizId, orgUser);
 
 	for(int i = 0;i < answer;i++){
 		view_->sendUserModified(i, orgUser, 0x0f);
