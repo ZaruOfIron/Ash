@@ -38,21 +38,47 @@ void Ash::run()
 	Run();
 }
 
+void Ash::save()
+{
+	log_->write("Ash::save()");
+
+	// 保存処理
+	SaveData save;
+	save.users = &users_;
+	save.prevMsgs = &prevMsgs_;
+
+	std::ostringstream oss;	controler_->getSaveData(oss);
+	save.luaVars = oss.str();
+
+	oss.str("");
+	boost::archive::text_oarchive oa(oss);
+	oa << save;
+	saves_.push_back(oss.str());
+}
+
 void Ash::undo()
 {
 	if(saves_.size() == 0)	return;
 
+	log_->write("Ash::undo()");
+
 	std::istringstream iss(saves_.back());	saves_.pop_back();
 	boost::archive::text_iarchive ia(iss);
-	SaveData data;	ia >> data;
-	blankData_.at(data.index) = data;
+	SaveData save;	ia >> save;
 
-	users_.at(data.index) = data.user;
+	users_ = *(save.users);
+	delete save.users;
 
-	view_->sendUserModified(data.index, data.user, data.modIndex);
-	for(int id : data.info)	view_->sendInfo(id);
+	prevMsgs_ = *(save.prevMsgs);
+	delete save.prevMsgs;	// newed by boost::serialization
+	for(int i = 0;i < prevMsgs_.size();i++){
+		auto& msg = prevMsgs_.at(i);
 
-	iss.str(data.luaVars);	iss.clear(std::istringstream::goodbit);
+		view_->sendUserModified(i, msg.user, msg.modIndex);
+		for(int id : msg.info)	view_->sendInfo(id);
+	}
+
+	iss.str(save.luaVars);	iss.clear(std::istringstream::goodbit);
 	controler_->restoreSaveData(iss);
 }
 
@@ -70,12 +96,12 @@ void Ash::luaInitialize(int answer, int winner, const std::string& title, const 
 {
 	winner_ = winner;
 	users_.resize(answer, orgUser);
-	blankData_.resize(answer);
 
 	view_->initialize(answer, winner, title, subtitle, quizId);
 
 	for(int i = 0;i < answer;i++){
 		view_->sendUserModified(i, orgUser, 0x0f);
+		prevMsgs_.push_back(PrevMsg(orgUser, 0x0f));
 	}
 }
 
@@ -95,21 +121,9 @@ void Ash::luaUpdate(const UserUpdateMessage& msg)
 	if(user.status != User::STATUS::FIGHTER)	// 対象外
 		return;
 
-	// 保存処理
-	SaveData& data = blankData_.at(msg.index);
-	if(data.index != -1){
-		std::ostringstream oss;	controler_->getSaveData(oss);
-		data.luaVars = oss.str();
-
-		oss.str("");
-		boost::archive::text_oarchive oa(oss);
-		oa << data;
-		saves_.push_back(oss.str());
-	}
-	else	data.index = msg.index;
-
+	auto& prevMsg = prevMsgs_.at(msg.index);
 	// 変更していく
-	int& modIndex = data.modIndex;
+	int& modIndex = prevMsg.modIndex;
 	modIndex = 0;
 	if(msg.name){
 		user.name = *(msg.name);
@@ -129,15 +143,16 @@ void Ash::luaUpdate(const UserUpdateMessage& msg)
 	}
 
 	view_->sendUserModified(msg.index, user, modIndex);
+	prevMsg.user = user;
 
-	data.info.clear();
+	prevMsg.info.clear();
 	for(int id : msg.info){
 		// 勝ち抜け(1)と敗退(2)は記録しておく
 		if(id == 1)	user.status = User::STATUS::WINNER;
 		else if(id == 2)	user.status = User::STATUS::LOSER;
 
-		data.info.push_back(id);
 		view_->sendInfo(id);
+		prevMsg.info.push_back(id);
 	}
 
 	// 終われば、終了処理を行う

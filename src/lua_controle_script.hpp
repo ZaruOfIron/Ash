@@ -30,6 +30,7 @@ private:
 	static int luaSetUserButtonState(lua_State *L);
 	static int luaSetSystemButtonState(lua_State *L);
 	static int luaAddTrackingVar(lua_State *L);
+	static int luaSave(lua_State *L);
 
 public:
 	LuaControleScript(Ash& ash, const std::string& filename);

@@ -20,28 +20,43 @@ private:
 	std::unique_ptr<LogWindow> log_;
 	int winner_;
 	std::string saveFileName_;
+	std::vector<std::string> saves_;
 
-	struct SaveData
+	struct PrevMsg
 	{
-		int index;
 		User user;
 		int modIndex;
 		std::vector<int> info;
-		std::string luaVars;
 
-		SaveData()
-			: index(-1){}
+		PrevMsg(){}
+		PrevMsg(const User& user_, int modIndex_)
+			: user(user_), modIndex(modIndex_){}
+
+		private:
+		friend class boost::serialization::access;
+		template<class Archive>
+			void serialize(Archive& ar, const unsigned int version)
+			{
+				ar & user & modIndex & info;
+			}
+
+	};
+	std::vector<PrevMsg> prevMsgs_;
+
+	struct SaveData
+	{
+		std::vector<User> *users;
+		std::vector<PrevMsg> *prevMsgs;
+		std::string luaVars;
 
 	private:
 		friend class boost::serialization::access;
 		template<class Archive>
 			void serialize(Archive& ar, const unsigned int version)
 			{
-				ar & index & user & modIndex & info & luaVars;
+				ar & users & prevMsgs & luaVars;
 			}
 	};
-	std::vector<SaveData> blankData_;
-	std::vector<std::string> saves_;
 
 	// クイズの終了確認を行う
 	// 戻り値が
@@ -56,6 +71,7 @@ public:
 
 	void setScript(const std::string& filename);
 	void run();
+	void save();
 	void undo();
 
 	const User& getUser(int index) const;
