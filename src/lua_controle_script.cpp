@@ -2,7 +2,12 @@
 #include "lua_exception.hpp"
 #include "ash.hpp"
 #include "controle_window.hpp"
+#include <boost/serialization/map.hpp>
+#include <boost/archive/text_oarchive.hpp>
+#include <boost/archive/text_iarchive.hpp>
 #include <cassert>
+#include <map>
+
 
 LuaControleScript *LuaControleScript::thisPtr_ = nullptr;
 
@@ -45,6 +50,7 @@ void LuaControleScript::initialize()
 	static const luaL_Reg ash_config[] = {
 		{ "create_user_button", &LuaControleScript::luaCreateUserButton },
 		{ "create_system_button", &LuaControleScript::luaCreateSystemButton },
+		{ "add_tracking_var", &LuaControleScript::luaAddTrackingVar },
 		{ NULL, NULL }
 	};
 
@@ -91,6 +97,43 @@ void LuaControleScript::initialize()
 
 	window_->setAnswer(answer_);
 	window_->Create();
+}
+
+void LuaControleScript::getSaveData(std::ostream& os)
+{
+	auto L = lua_.get();
+
+	std::map<std::string, int> data;	// intに決めうち
+	// グローバル変数の入ったテーブルを持ってくる
+	lua_rawgeti(L, LUA_REGISTRYINDEX, LUA_RIDX_GLOBALS);
+	lua_pushnil(L);
+	while(lua_next(L, -2)){
+		// -2: key, -1: value
+		// trackingVars_の中にある変数名だったら
+		auto it = std::find(trackingVars_.begin(), trackingVars_.end(), std::string(luaL_checkstring(L, -2)));
+		if(it != trackingVars_.end()){
+			data.insert(std::make_pair(*it, luaL_checkint(L, -1)));
+		}
+
+		lua_pop(L, 1);
+	}
+
+	boost::archive::text_oarchive oa(os);
+	oa << data;
+}
+
+void LuaControleScript::restoreSaveData(std::istream& is)
+{
+	auto L = lua_.get();
+
+	std::map<std::string, int> data;
+	boost::archive::text_iarchive ia(is);
+	ia >> data;
+
+	for(auto it = data.begin();it != data.end();it++){
+		lua_pushnumber(L, it->second);
+		lua_setglobal(L, it->first.c_str());
+	}
 }
 
 void LuaControleScript::onUserButton(int index, int id)
@@ -219,5 +262,10 @@ int LuaControleScript::luaSetUserButtonState(lua_State *L)
 int LuaControleScript::luaSetSystemButtonState(lua_State *L)
 {
 	thisPtr_->window_->setSystemButtonState(luaL_checkint(L, 1), checkboolean(L, 2));
+}
+
+int LuaControleScript::luaAddTrackingVar(lua_State *L)
+{
+	thisPtr_->trackingVars_.push_back(luaL_checkstring(L, 1));
 }
 

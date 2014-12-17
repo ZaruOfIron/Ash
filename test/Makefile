@@ -5,7 +5,7 @@ CPPS=main.cpp test_controle_script.cpp test_ash.cpp ../src/lua_controle_script.c
 OBJS=$(CPPS:.cpp=.o)
 
 ash: $(OBJS)
-	g++ -o ash_test $(OBJS) $(LIBRARY) -lcomctl32 -lgdi32 -llua52 -lboost_test_exec_monitor-mgw48-mt-1_57
+	g++ -o ash_test $(OBJS) $(LIBRARY) -lcomctl32 -lgdi32 -llua52 -lboost_serialization-mgw48-mt-1_57 -lboost_test_exec_monitor-mgw48-mt-1_57
 
 .cpp.o:
 	g++ $(CXXFLAGS) $(INCLUDE) -c $< -o $(<:.cpp=.o)
