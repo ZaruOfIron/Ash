@@ -1,11 +1,12 @@
 #include "ash.hpp"
 #include "lua_controle_script.hpp"
 #include "copydata_view.hpp"
+#include "resource.h"
 
 //#include <iostream>
 
 Ash::Ash()
-	: users_(), controler_(), view_(new CopyDataView("AUAUA"))
+	: users_(), controler_(), view_(new CopyDataView("AUAUA")), log_(ID_DIALOG)
 {
 }
 
@@ -17,7 +18,8 @@ void Ash::setScript(const std::string& filename)
 
 void Ash::run()
 {
-	controler_->run();
+	log_.DoModeless();
+	Run();
 }
 
 const User& Ash::getUser(int index) const

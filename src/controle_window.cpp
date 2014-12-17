@@ -1,44 +1,33 @@
 #include "controle_window.hpp"
 #include "lua_controle_script.hpp"
 
-ControleWindowFrame::ControleWindowFrame(LuaControleScript *controler)
-	: controler_(controler)
+ControleWindow::ControleWindow(LuaControleScript *controler)
+	: controler_(controler), answer_(0)
 {}
 
-void ControleWindowFrame::registerUserButton(const ButtonData& data)
+void ControleWindow::setAnswer(int answer)
+{
+	answer_ = answer;
+}
+
+void ControleWindow::registerUserButton(const ButtonData& data)
 {
 	userForm_.push_back(data);
 }
 
-void ControleWindowFrame::registerSystemButton(const ButtonData& data)
+void ControleWindow::registerSystemButton(const ButtonData& data)
 {
 	systemForm_.push_back(data);
 }
 
-void ControleWindowFrame::setUserButtonState(int index, int id, bool hasEnabled)
-{
-	window_->setButtonState(index, id, hasEnabled);
-}
-
-void ControleWindowFrame::setSystemButtonState(int id, bool hasEnabled)
-{
-	setUserButtonState(0, id, hasEnabled);
-}
-
-int ControleWindowFrame::run(int answer)
-{
-	window_.reset(new ControleWindow(this, answer));
-	window_->Create();
-	return Run();
-}
-
-ControleWindow::ControleWindow(ControleWindowFrame *frame, int answer)
-	: frame_(frame), answer_(answer)
-{}
-
-void ControleWindow::setButtonState(int index, int id, bool hasEnabled)
+void ControleWindow::setUserButtonState(int index, int id, bool hasEnabled)
 {
 	::EnableWindow(GetDlgItem((index << 8) | id)->GetHwnd(), hasEnabled);
+}
+
+void ControleWindow::setSystemButtonState(int id, bool hasEnabled)
+{
+	setUserButtonState(0, id, hasEnabled);
 }
 
 void ControleWindow::setClientSize(int width, int height)
@@ -58,9 +47,9 @@ void ControleWindow::OnCreate()
 		int nx = i % 6, ny = i / 6;
 		CRect rect(
 			10 + nx * (FORM_PART_WIDTH + 20),
-			10 + (FORM_PART_HEIGHT + 10) * (frame_->userForm_.size() + 1) * ny,
+			10 + (FORM_PART_HEIGHT + 10) * (userForm_.size() + 1) * ny,
 			10 + nx * (FORM_PART_WIDTH + 20) + FORM_PART_WIDTH,
-			10 + (FORM_PART_HEIGHT + 10) * (frame_->userForm_.size() + 1) * (ny + 1));
+			10 + (FORM_PART_HEIGHT + 10) * (userForm_.size() + 1) * (ny + 1));
 		if(scrWidth < rect.right + 10)	scrWidth = rect.right + 10;
 		if(scrHeight < rect.bottom + 10)	scrHeight = rect.bottom + 10;
 
@@ -75,9 +64,9 @@ void ControleWindow::OnCreate()
 			GetHwnd(), reinterpret_cast<HMENU>(index << 8),
 			::GetModuleHandle(NULL), NULL);
 
-		for(int j = 0;j < frame_->userForm_.size();j++){
+		for(int j = 0;j < userForm_.size();j++){
 			int x = rect.left, y = rect.top + (j + 1) * (FORM_PART_HEIGHT + 10);
-			const auto& part = frame_->userForm_.at(j);
+			const auto& part = userForm_.at(j);
 			::CreateWindowEx(
 				0,
 				"BUTTON",
@@ -92,7 +81,7 @@ void ControleWindow::OnCreate()
 
 	// System FormÇê›íu
 	int systemY = scrHeight;
-	for(int i = 0;i < frame_->systemForm_.size();i++){
+	for(int i = 0;i < systemForm_.size();i++){
 		int nx = i % 6, ny = i / 6;
 
 		CRect rect(
@@ -105,7 +94,7 @@ void ControleWindow::OnCreate()
 		::CreateWindowEx(
 			0,
 			"BUTTON",
-			frame_->systemForm_.at(i).caption.c_str(),
+			systemForm_.at(i).caption.c_str(),
 			WS_CHILD | WS_VISIBLE | WS_TABSTOP | BS_PUSHBUTTON,
 			rect.left, rect.top, rect.Width(), FORM_PART_HEIGHT,
 			GetHwnd(), reinterpret_cast<HMENU>(i + 1),
@@ -128,12 +117,12 @@ BOOL ControleWindow::OnCommand(WPARAM wParam, LPARAM lParam)
 	if(id == 0){	// Edit
 		//if(HIWORD(wParam) == EN_UPDATE){
 		if(HIWORD(wParam) == EN_KILLFOCUS){
-			frame_->controler_->onName(index, std::string(GetDlgItem(num)->GetWindowText()));
+			controler_->onName(index, std::string(GetDlgItem(num)->GetWindowText()));
 		}
 	}
 	else{
-		if(index == 0)	frame_->controler_->onSystemButton(id);
-		else	frame_->controler_->onUserButton(index, id);
+		if(index == 0)	controler_->onSystemButton(id);
+		else	controler_->onUserButton(index, id);
 	}
 
 	return TRUE;

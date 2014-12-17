@@ -4,15 +4,18 @@
 #include "user.hpp"
 #include "controle_script.hpp"
 #include "view.hpp"
+#include "log_window.hpp"
 #include <memory>
 #include <vector>
+#include <wincore.h>
 
-class Ash
+class Ash : private CWinApp
 {
 private:
 	std::vector<User> users_;
 	std::unique_ptr<ControleScript> controler_;
 	std::unique_ptr<View> view_;
+	LogWindow log_;
 	int winner_;
 
 	// クイズの終了確認を行う
