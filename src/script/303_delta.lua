@@ -1,7 +1,7 @@
 require('ash_helper')
 
 ANSWER = 3
-SCORE_LIMIT = 5
+SCORE_LIMIT = 17
 
 dir_count = 0
 suc_index = 0
@@ -14,8 +14,8 @@ function initialize()
 	return {
 		answer = ANSWER,
 		winner = 1,
-		title = '?th stage',
-		subtitle = 'ƒWƒƒƒ“ƒ‹',
+		title = '3rd Round 3rd step Final',
+		subtitle = 'KiRa-KiRa Sensation',
 		quizid = 202,
 		org_user = ash_helper.all_zero_user
 	}
