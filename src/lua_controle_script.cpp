@@ -103,24 +103,15 @@ void LuaControleScript::initialize()
 void LuaControleScript::getSaveData(std::ostream& os)
 {
 	auto L = lua_.get();
+	
+	// 関数を積む
+	lua_getglobal(L, "make_save_data");
+	// 引数を積む
+	// 呼び出す
+	// lua_pcall(L, 引数, 戻り値, ?)
+	if(lua_pcall(L, 0, 1, 0))	throw LuaCantCallFuncError(luaL_checkstring(L, -1));
 
-	std::map<std::string, int> data;	// intに決めうち
-	// グローバル変数の入ったテーブルを持ってくる
-	lua_rawgeti(L, LUA_REGISTRYINDEX, LUA_RIDX_GLOBALS);
-	lua_pushnil(L);
-	while(lua_next(L, -2)){
-		// -2: key, -1: value
-		// trackingVars_の中にある変数名だったら
-		auto it = std::find(trackingVars_.begin(), trackingVars_.end(), std::string(luaL_checkstring(L, -2)));
-		if(it != trackingVars_.end()){
-			data.insert(std::make_pair(*it, luaL_checkint(L, -1)));
-		}
-
-		lua_pop(L, 1);
-	}
-
-	boost::archive::text_oarchive oa(os);
-	oa << data;
+	os << luaL_checkstring(L, -1);
 }
 
 void LuaControleScript::restoreSaveData(std::istream& is)
