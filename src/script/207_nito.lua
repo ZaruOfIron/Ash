@@ -15,8 +15,8 @@ function initialize()
 	return {
 		answer = ANSWER,
 		winner = WINNER,
-		title = '?th stage',
-		subtitle = '２答',
+		title = '3rd Round 3rd step Quarter final',
+		subtitle = 'コースβ にっこにっこにー',
 		quizid = 207,
 		org_user = ash_helper.all_zero_user
 	}
@@ -38,8 +38,8 @@ function on_user_button(index, id)
 	if id == 1 then	-- correct
 		data.correct = user.correct + 1
 
-		if answer_count == 0 then
-			data.score = user.score + 2	-- 一着
+		if answer_count == 0 then	-- 一着
+			data.score = user.score + 2
 			table.insert(info, 20701)
 		else	-- 二着
 			data.score = user.score + 1
@@ -48,7 +48,11 @@ function on_user_button(index, id)
 	elseif id == 2 then	-- wrong
 		data.wrong = user.wrong + 1
 
-		data.score = user.score - 1
+		if answer_count == 0 then	-- 一着
+			data.score = user.score - 1
+		else	-- 二着
+			data.score = user.score
+		end
 	end
 
 	answer_count = (answer_count + 1) % 2
