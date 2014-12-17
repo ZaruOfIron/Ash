@@ -14,8 +14,8 @@ function initialize()
 	return {
 		answer = ANSWER,
 		winner = WINNER,
-		title = '?th stage',
-		subtitle = 'ジャンル',
+		title = '3rd Round 2nd step',
+		subtitle = 'コースα やりたいことは',
 		quizid = 202,
 		org_user = ash_helper.all_zero_user
 	}
@@ -23,7 +23,17 @@ end
 
 function on_system_button(id)
 	if id == 1 then	-- finish
-		ash_helper.finish(ANSWER, WINNER)
+		local users = ash_helper.get_all_users(ANSWER)
+		-- socre => correct => index
+		table.sort(users,
+			function(a, b)
+				if a.score ~= b.score then return a.score > b.score end
+				if a.correct ~= b.correct then return a.correct > b.correct end
+				return a.index < b.index
+			end)
+		for i = 1, WINNER do
+			ash.set_user(users[i].index, {}, {1})
+		end
 	end
 end
 
