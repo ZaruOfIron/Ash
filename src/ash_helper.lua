@@ -4,7 +4,7 @@ all_zero_user = { index = 0, correct = 0, wrong = 0, score = 0 }
 
 -- 引数の順番のindexで、user buttonを作成する
 function create_user_buttons(...)
-	captions = { ... }
+	local captions = { ... }
 	for index, caption in pairs(captions) do
 		ash.config.create_user_button(index, caption)
 	end
@@ -12,7 +12,7 @@ end
 
 -- 引数の順番のindexで、system buttonを作成する
 function create_system_buttons(...)
-	captions = { ... }
+	local captions = { ... }
 	for index, caption in pairs(captions) do
 		ash.config.create_system_button(index, caption)
 	end
@@ -58,6 +58,17 @@ function finish(answer, winner)
 	end
 end
 
+-- 引数の名前のグローバル変数の中身が入った、その名前のフィールドを持つテーブルを返す
+function create_twin_table(...)
+	local ret = {}
+	local names = { ... }
+	for index, name in pairs(names) do
+		ret[name] = _G[name]
+	end
+
+	return ret
+end
+
 -- serialize
 function value2str(v)
 	local vt = type(v)
@@ -72,7 +83,7 @@ function value2str(v)
 	conv_table['nil'] = function(v) return 'nil' end
 	conv_table['function'] = function(v) return '"*function"' end
 
-	prod = conv_table[vt]
+	local prod = conv_table[vt]
 	return prod == nil and '"UnsupportFormat"' or prod(v)
 end
 
@@ -84,7 +95,7 @@ function field2str(v)
 		string = function(v) return string.format('%s', v) end
 	}
 
-	prod = conv_table[vt]
+	local prod = conv_table[vt]
 	return prod == nil and 'UnknownField' or prod(v)
 end
 

@@ -5,6 +5,13 @@ WINNER = 4
 
 checked_users = {}
 
+function export_save_data()
+	return ''
+end
+
+function import_save_data(str)
+end
+
 function initialize()
 	-- create user buttons
 	ash_helper.create_user_buttons('CHECK')
@@ -25,6 +32,8 @@ end
 
 function on_system_button(id)
 	if id == 1 then	-- submit
+		ash.save()
+
 		-- ’Ç‰Á“_‚ðŒˆ’è
 		local user_count = table.maxn(checked_users)
 		local add_score = 0
@@ -45,6 +54,8 @@ function on_system_button(id)
 	elseif id == 2 then	-- clear
 		checked_users = {}
 	elseif id == 3 then	-- finish
+		ash.save()
+
 		local users = ash_helper.get_all_users(ANSWER)
 		table.sort(users,
 			function(a, b)

@@ -3,6 +3,13 @@ require('ash_helper')
 ANSWER = 10
 WINNER = 4
 
+function export_save_data()
+	return ''
+end
+
+function import_save_data(str)
+end
+
 function initialize()
 	-- create user buttons
 	ash_helper.create_user_buttons('CORRECT', 'WRONG')
@@ -14,7 +21,7 @@ function initialize()
 	return {
 		answer = ANSWER,
 		winner = WINNER,
-		title = '3rd Round 2nd step',
+		title = '3rd Round 2nd step First set',
 		subtitle = 'ƒR[ƒXƒ¿ ‚â‚è‚½‚¢‚±‚Æ‚Í',
 		quizid = 202,
 		org_user = ash_helper.all_zero_user
@@ -22,6 +29,8 @@ function initialize()
 end
 
 function on_system_button(id)
+	ash.save()
+
 	if id == 1 then	-- finish
 		local users = ash_helper.get_all_users(ANSWER)
 		-- socre => correct => index
@@ -38,6 +47,8 @@ function on_system_button(id)
 end
 
 function on_user_button(index, id)
+	ash.save()
+
 	local user, data = ash.get_user(index), {}
 
 	if id == 1 then	-- correct

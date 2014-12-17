@@ -8,6 +8,15 @@ CHARGE_COUNT_LIMIT = 3
 
 charge_count = {}
 
+function export_save_data()
+	return ash_helper.serialize(ash_helper.create_twin_table('charge_count'))
+end
+
+function import_save_data(str)
+	local data = ash_helper.deserialize(str)
+	charge_count = data.charge_count
+end
+
 function initialize()
 	-- create user buttons
 	ash_helper.create_user_buttons('CHARGE', 'ATTACK', 'WRONG')
@@ -19,8 +28,8 @@ function initialize()
 	return {
 		answer = ANSWER,
 		winner = WINNER,
-		title = '3rd Round 1st step',
-		subtitle = 'Final set Shangri-La Shower',
+		title = '3rd Round 1st step First set',
+		subtitle = 'Shangri-La Shower',
 		quizid = 204,
 		org_user = {
 			correct = 0,
@@ -31,6 +40,8 @@ function initialize()
 end
 
 function on_system_button(id)
+	ash.save()
+
 	if id == 1 then	-- finish
 		local users = ash_helper.get_all_users(ANSWER)
 		table.sort(users,
@@ -46,6 +57,8 @@ function on_system_button(id)
 end
 
 function on_user_button(index, id)
+	ash.save()
+
 	local user, data = ash.get_user(index), {}
 
 	if id == 1 then -- charge
@@ -84,7 +97,6 @@ function on_user_button(index, id)
 			ash.set_user(index, data, {2})
 		end
 	end
-
 	
 	ash.set_user(index, data)
 end

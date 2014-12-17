@@ -6,6 +6,16 @@ SCORE_LIMIT = 17
 dir_count = 0
 suc_index = 0
 
+function export_save_data()
+	return ash_helper.serialize(ash_helper.create_twin_table('dir_count', 'suc_index'))
+end
+
+function import_save_data(str)
+	local data = ash_helper.deserialize(str)
+	dir_count = data.dir_count
+	suc_index = data.suc_index
+end
+
 function initialize()
 	-- create user buttons
 	ash_helper.create_user_buttons('CORRECT', 'WRONG')
@@ -22,7 +32,9 @@ function initialize()
 end
 
 function on_user_button(index, id)
-	local user, data = ash.get_user(index), {}
+	ash.save()
+
+	local user, data, info = ash.get_user(index), {}, {}
 
 	if id == 1 then	-- correct
 		data.correct = user.correct + 1
@@ -46,8 +58,12 @@ function on_user_button(index, id)
 		else
 			ash.set_user(target.index, { score = target.score + 1 })
 		end
+
+		if suc_index == index then
+			suc_index = 0
+		end
 	end
 
-	ash.set_user(index, data)
+	ash.set_user(index, data, info)
 end
 
