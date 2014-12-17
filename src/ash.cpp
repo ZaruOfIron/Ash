@@ -20,9 +20,11 @@ std::string getDateTimeString()
 }
 
 Ash::Ash()
-	: users_(), controler_(), view_(new CopyDataView("AUAUA")), log_(ID_DIALOG),
+	: users_(), controler_(), view_(new CopyDataView("AUAUA")),
 	saveFileName_((boost::format("%1%.log") % getDateTimeString()).str())
-{}
+{
+	log_.reset(new LogWindow(*this, ID_DIALOG));
+}
 
 void Ash::setScript(const std::string& filename)
 {
@@ -32,12 +34,14 @@ void Ash::setScript(const std::string& filename)
 
 void Ash::run()
 {
-	log_.DoModeless();
+	log_->DoModeless();
 	Run();
 }
 
 void Ash::undo()
 {
+	if(saves_.size() == 0)	return;
+
 	std::istringstream iss(saves_.back());	saves_.pop_back();
 	boost::archive::text_iarchive ia(iss);
 	SaveData data;	ia >> data;
