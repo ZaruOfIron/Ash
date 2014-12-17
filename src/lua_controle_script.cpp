@@ -43,8 +43,6 @@ void LuaControleScript::initialize()
 	static const luaL_Reg ash[] = {
 		{ "get_user", &LuaControleScript::luaGetUser },
 		{ "set_user", &LuaControleScript::luaSetUser },
-		{ "set_user_button_state", &LuaControleScript::luaSetUserButtonState },
-		{ "set_system_button_state", &LuaControleScript::luaSetSystemButtonState },
 		{ "save", &LuaControleScript::luaSave },
 		{ NULL, NULL }
 	};
@@ -250,16 +248,6 @@ int LuaControleScript::luaCreateUserButton(lua_State *L)
 int LuaControleScript::luaCreateSystemButton(lua_State *L)
 {
 	thisPtr_->window_->registerSystemButton(ButtonData(luaL_checkint(L, 1), luaL_checkstring(L, 2)));
-}
-
-int LuaControleScript::luaSetUserButtonState(lua_State *L)
-{
-	thisPtr_->window_->setUserButtonState(luaL_checkint(L, 1), luaL_checkint(L, 2), checkboolean(L, 3));
-}
-
-int LuaControleScript::luaSetSystemButtonState(lua_State *L)
-{
-	thisPtr_->window_->setSystemButtonState(luaL_checkint(L, 1), checkboolean(L, 2));
 }
 
 int LuaControleScript::luaSave(lua_State *L)

@@ -26,8 +26,6 @@ private:
 	static int luaSetUser(lua_State *L);
 	static int luaCreateUserButton(lua_State *L);
 	static int luaCreateSystemButton(lua_State *L);
-	static int luaSetUserButtonState(lua_State *L);
-	static int luaSetSystemButtonState(lua_State *L);
 	static int luaSave(lua_State *L);
 
 public:

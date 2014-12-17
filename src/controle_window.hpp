@@ -46,9 +46,6 @@ public:
 	void registerUserButton(const ButtonData& data);
 	void registerSystemButton(const ButtonData& data);
 
-	void setUserButtonState(int index, int id, bool hasEnabled);
-	void setSystemButtonState(int id, bool hasEnabled);
-
 	LRESULT WndProc(UINT uMsg, WPARAM wParam, LPARAM lParam);
 };
 
