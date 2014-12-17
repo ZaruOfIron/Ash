@@ -111,7 +111,7 @@ void Ash::luaInitialize(int answer, int winner, const std::string& title, const 
 	for(int i = 0;i < answer;i++){
 		view_->sendUserModified(i, orgUser, 0x0f);
 		prevMsgs_.push_back(PrevMsg(orgUser, 0x0f));
-		msgOrders_.at(i) = nowMsgOrder_++;
+		msgOrders_.push_back(nowMsgOrder_++);
 	}
 }
 
