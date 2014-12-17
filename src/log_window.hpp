@@ -10,6 +10,7 @@
 class LogWindow : public CDialog
 {
 private:
+	CEdit logEdit_;
 
 	BOOL OnInitDialog();
 	BOOL OnCommand(WPARAM wParam, LPARAM lParam);
