@@ -2,12 +2,30 @@
 #include "lua_controle_script.hpp"
 #include "copydata_view.hpp"
 #include "resource.h"
+#include <boost/archive/text_oarchive.hpp>
+#include <boost/archive/text_iarchive.hpp>
+#include <boost/date_time.hpp>
+#include <boost/format.hpp>
+#include <list>
+#include <utility>
+#include <sstream>
 
 //#include <iostream>
 
-Ash::Ash()
-	: users_(), controler_(), view_(new CopyDataView("AUAUA")), log_(ID_DIALOG)
+std::string getDateTimeString()
 {
+	auto f = new boost::posix_time::time_facet("%y%m%d_%H%M%S");
+	std::ostringstream oss;
+	oss.imbue(std::locale(oss.getloc(), f));
+	oss << boost::posix_time::second_clock::local_time();
+	return oss.str();
+}
+
+Ash::Ash()
+	: users_(), controler_(), view_(new CopyDataView("AUAUA")),
+	saveFileName_((boost::format("%1%.log") % getDateTimeString()).str())
+{
+	log_.reset(new LogWindow(*this, ID_DIALOG));
 }
 
 void Ash::setScript(const std::string& filename)
@@ -18,8 +36,58 @@ void Ash::setScript(const std::string& filename)
 
 void Ash::run()
 {
-	log_.DoModeless();
+	log_->DoModeless();
 	Run();
+}
+
+void Ash::save()
+{
+	log_->write("Ash::save()");
+
+	// 保存処理
+	SaveData save;
+	save.users = &users_;
+	save.prevMsgs = &prevMsgs_;
+
+	std::ostringstream oss;	controler_->getSaveData(oss);
+	save.luaVars = oss.str();
+
+	oss.str("");
+	boost::archive::text_oarchive oa(oss);
+	oa << save;
+	saves_.push_back(oss.str());
+}
+
+void Ash::undo()
+{
+	if(saves_.size() == 0)	return;
+
+	log_->write("Ash::undo()");
+
+	std::istringstream iss(saves_.back());	saves_.pop_back();
+	boost::archive::text_iarchive ia(iss);
+	SaveData save;	ia >> save;
+
+	users_ = *(save.users);
+	delete save.users;
+
+	prevMsgs_ = *(save.prevMsgs);
+	delete save.prevMsgs;	// newed by boost::serialization
+	// メッセージを送る順番を算出する
+	std::list<std::pair<int, int>> order;
+	for(int i = 0;i < msgOrders_.size();i++)	order.push_back(std::make_pair(i, msgOrders_.at(i)));
+	order.sort([](const std::pair<int, int>& lhs, const std::pair<int, int>& rhs) { return lhs.second < rhs.second; });
+	// 順番どおりに送っていく
+	for(auto& item : order){
+		int index = item.first;
+		auto& msg = prevMsgs_.at(index);
+
+		view_->sendUserModified(index, msg.user, msg.modIndex);
+		for(int id : msg.info)	view_->sendInfo(id);
+	}
+
+	iss.str(save.luaVars);	iss.clear(std::istringstream::goodbit);
+	controler_->restoreSaveData(iss);
 }
 
 const User& Ash::getUser(int index) const
@@ -39,8 +107,11 @@ void Ash::luaInitialize(int answer, int winner, const std::string& title, const 
 
 	view_->initialize(answer, winner, title, subtitle, quizId, orgUser);
 
+	nowMsgOrder_ = 0;
 	for(int i = 0;i < answer;i++){
 		//view_->sendUserModified(i, orgUser, 0x0f);
+		prevMsgs_.push_back(PrevMsg(orgUser, 0x0f));
+		msgOrders_.push_back(nowMsgOrder_++);
 	}
 }
 
@@ -60,7 +131,10 @@ void Ash::luaUpdate(const UserUpdateMessage& msg)
 	if(user.status != User::STATUS::FIGHTER)	// 対象外
 		return;
 
-	int modIndex = 0;
+	auto& prevMsg = prevMsgs_.at(msg.index);
+	// 変更していく
+	int& modIndex = prevMsg.modIndex;
+	modIndex = 0;
 	if(msg.name){
 		user.name = *(msg.name);
 		modIndex |= 1 << 0;
@@ -79,13 +153,16 @@ void Ash::luaUpdate(const UserUpdateMessage& msg)
 	}
 
 	view_->sendUserModified(msg.index, user, modIndex);
+	prevMsg.user = user;
 
+	prevMsg.info.clear();
 	for(int id : msg.info){
 		// 勝ち抜け(1)と敗退(2)は記録しておく
 		if(id == 1)	user.status = User::STATUS::WINNER;
 		else if(id == 2)	user.status = User::STATUS::LOSER;
 
 		view_->sendInfo(id);
+		prevMsg.info.push_back(id);
 	}
 
 	// 終われば、終了処理を行う
@@ -108,6 +185,9 @@ void Ash::luaUpdate(const UserUpdateMessage& msg)
 			view_->sendInfo(1);
 		}
 	}
+
+	// 順番を登録する
+	msgOrders_.at(msg.index) = nowMsgOrder_++;
 }
 
 Ash::FINISH_STATUS Ash::getFinishStatus() const

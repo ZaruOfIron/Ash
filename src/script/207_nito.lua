@@ -2,7 +2,17 @@ require('ash_helper')
 
 ANSWER = 10
 WINNER = 4
+
 answer_count = 0
+
+function export_save_data()
+	return ash_helper.serialize(ash_helper.create_twin_table('answer_count'))
+end
+
+function import_save_data(str)
+	local data = ash_helper.deserialize(str)
+	answer_count = data.answer_count
+end
 
 function initialize()
 	-- create user buttons
@@ -23,6 +33,8 @@ function initialize()
 end
 
 function on_system_button(id)
+	ash.save()
+
 	if id == 1 then	-- finish
 		local users = ash_helper.get_all_users(ANSWER)
 		ash_helper.sort_users(users)
@@ -33,6 +45,8 @@ function on_system_button(id)
 end
 
 function on_user_button(index, id)
+	ash.save()
+
 	local user, data, info = ash.get_user(index), {}, {}
 
 	if id == 1 then	-- correct
@@ -50,8 +64,10 @@ function on_user_button(index, id)
 
 		if answer_count == 0 then	-- ˆê’…
 			data.score = user.score - 1
+			table.insert(info, 20701)
 		else	-- “ñ’…
 			data.score = user.score
+			table.insert(info, 20702)
 		end
 	end
 

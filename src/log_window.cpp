@@ -1,5 +1,6 @@
 #include "log_window.hpp"
 #include "resource.h"
+#include "ash.hpp"
 
 BOOL LogWindow::OnInitDialog()
 {
@@ -10,16 +11,16 @@ BOOL LogWindow::OnInitDialog()
 
 BOOL LogWindow::OnCommand(WPARAM wParam, LPARAM lParam)
 {
-	/*
 	switch(LOWORD(wParam))
 	{
+	case ID_UNDO:
+		ash_.undo();
+		return TRUE;
 	}
-	*/
 
 	return FALSE;
 }
 
-#include <iostream>
 void LogWindow::write(const std::string& msg)
 {
 	if(!logEdit_.IsWindow())	return;

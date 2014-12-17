@@ -20,16 +20,6 @@ void ControleWindow::registerSystemButton(const ButtonData& data)
 	systemForm_.push_back(data);
 }
 
-void ControleWindow::setUserButtonState(int index, int id, bool hasEnabled)
-{
-	::EnableWindow(GetDlgItem((index << 8) | id)->GetHwnd(), hasEnabled);
-}
-
-void ControleWindow::setSystemButtonState(int id, bool hasEnabled)
-{
-	setUserButtonState(0, id, hasEnabled);
-}
-
 void ControleWindow::setClientSize(int width, int height)
 {
 	CRect rw = GetWindowRect(), rc = GetClientRect();

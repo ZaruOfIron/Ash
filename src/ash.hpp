@@ -9,14 +9,56 @@
 #include <vector>
 #include <wincore.h>
 
+std::string getDateTimeString();
+
 class Ash : private CWinApp
 {
 private:
 	std::vector<User> users_;
 	std::unique_ptr<ControleScript> controler_;
 	std::unique_ptr<View> view_;
-	LogWindow log_;
+	std::unique_ptr<LogWindow> log_;
 	int winner_;
+	std::string saveFileName_;
+	std::vector<std::string> saves_;
+
+	struct PrevMsg
+	{
+		User user;
+		int modIndex;
+		std::vector<int> info;
+
+		PrevMsg(){}
+		PrevMsg(const User& user_, int modIndex_)
+			: user(user_), modIndex(modIndex_){}
+
+		private:
+		friend class boost::serialization::access;
+		template<class Archive>
+			void serialize(Archive& ar, const unsigned int version)
+			{
+				ar & user & modIndex & info;
+			}
+
+	};
+	std::vector<PrevMsg> prevMsgs_;
+	int nowMsgOrder_;
+	std::vector<int> msgOrders_;
+
+	struct SaveData
+	{
+		std::vector<User> *users;
+		std::vector<PrevMsg> *prevMsgs;
+		std::string luaVars;
+
+	private:
+		friend class boost::serialization::access;
+		template<class Archive>
+			void serialize(Archive& ar, const unsigned int version)
+			{
+				ar & users & prevMsgs & luaVars;
+			}
+	};
 
 	// クイズの終了確認を行う
 	// 戻り値が
@@ -31,6 +73,8 @@ public:
 
 	void setScript(const std::string& filename);
 	void run();
+	void save();
+	void undo();
 
 	const User& getUser(int index) const;
 	bool hasFinished() const;

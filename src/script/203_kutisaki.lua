@@ -2,8 +2,18 @@ require('ash_helper')
 
 ANSWER = 10
 WINNER = 4
+
 add_score = 0
 longest_word_counts = {}
+
+function export_save_data()
+	return ash_helper.serialize(ash_helper.create_twin_table('longest_word_counts'))
+end
+
+function import_save_data(str)
+	local data = ash_helper.deserialize(str)
+	longest_word_counts = data.longest_word_counts
+end
 
 function initialize()
 	-- create user buttons
@@ -22,7 +32,7 @@ function initialize()
 	return {
 		answer = ANSWER,
 		winner = WINNER,
-		title = '3rd Round 2nd step',
+		title = '3rd Round 2nd step First set',
 		subtitle = 'コースβ 凛は口先番長なお前らも大好きだにゃ～',
 		quizid = 203,
 		org_user = ash_helper.all_zero_user
@@ -35,6 +45,8 @@ function on_system_button(id)
 	elseif id == 11 then	-- clear
 		add_score = 0
 	elseif id == 12 then	-- finish
+		ash.save()
+
 		local users = ash_helper.get_all_users(ANSWER)
 		table.sort(users,
 			function(a, b)
@@ -52,6 +64,8 @@ function on_system_button(id)
 end
 
 function on_user_button(index, id)
+	ash.save()
+
 	local user, data = ash.get_user(index), {}
 
 	if id == 1 then	-- correct

@@ -2,10 +2,21 @@ require('ash_helper')
 
 ANSWER = 9
 WINNER = 1
-CHALLENGE_SCORE = 5
+CHALLENGE_CORRECT = 5
+WRONG_LIMIT = 3
 
 now_challenging = false
 seed_indexes = {}
+
+function export_save_data()
+	return ash_helper.serialize(ash_helper.create_twin_table('now_challenging', 'seed_indexes'))
+end
+
+function import_save_data(str)
+	local data = ash_helper.deserialize(str)
+	now_challenging = data.now_challenging
+	seed_indexes = data.seed_indexes
+end
 
 function initialize()
 	-- create user buttons
@@ -15,14 +26,16 @@ function initialize()
 	return {
 		answer = ANSWER,
 		winner = WINNER,
-		title = '3rd Round 2nd step',
-		subtitle = 'Final set 通過ぁ？ミトメラレナイワァ!!',
+		title = '3rd Round 2nd step Final set',
+		subtitle = '通過ぁ？ミトメラレナイワァ!!',
 		quizid = 205,
 		org_user = ash_helper.all_zero_user
 	}
 end
 
 function on_user_button(index, id)
+	ash.save()
+
 	local user, data, info = ash.get_user(index), {}, {}
 
 	if id == 1 then	-- correct
@@ -32,28 +45,26 @@ function on_user_button(index, id)
 			table.insert(info, 1)
 			now_challenging = false
 		else
-			data.score = user.score + 1
-			if data.score >= CHALLENGE_SCORE then
+			if data.correct >= CHALLENGE_CORRECT then
 				if ash_helper.search_array(seed_indexes, index) then
 					table.insert(info, 1)
 				else
 					now_challenging = true
+					table.insert(info, 20501)
 				end
 			end
 		end
 	elseif id == 2 then	-- wrong
-		data.wrong = user.wrong + 1
-
 		if now_challenging then
-			data.score = CHALLENGE_SCORE - 2
+			data.correct = CHALLENGE_CORRECT - 2
 			now_challenging = false
 			table.insert(seed_indexes, index)
 		else
-			data.score = user.score - 1
-		end
+			data.wrong = user.wrong + 1
 
-		if data.wrong >= 3 then
-			table.insert(info, 2)
+			if data.wrong >= WRONG_LIMIT then
+				table.insert(info, 2)
+			end
 		end
 	end
 

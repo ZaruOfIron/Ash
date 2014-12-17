@@ -2,7 +2,12 @@
 #include "lua_exception.hpp"
 #include "ash.hpp"
 #include "controle_window.hpp"
+#include <boost/serialization/map.hpp>
+#include <boost/archive/text_oarchive.hpp>
+#include <boost/archive/text_iarchive.hpp>
 #include <cassert>
+#include <map>
+
 
 LuaControleScript *LuaControleScript::thisPtr_ = nullptr;
 
@@ -38,8 +43,7 @@ void LuaControleScript::initialize()
 	static const luaL_Reg ash[] = {
 		{ "get_user", &LuaControleScript::luaGetUser },
 		{ "set_user", &LuaControleScript::luaSetUser },
-		{ "set_user_button_state", &LuaControleScript::luaSetUserButtonState },
-		{ "set_system_button_state", &LuaControleScript::luaSetSystemButtonState },
+		{ "save", &LuaControleScript::luaSave },
 		{ NULL, NULL }
 	};
 	static const luaL_Reg ash_config[] = {
@@ -91,6 +95,41 @@ void LuaControleScript::initialize()
 
 	window_->setAnswer(answer_);
 	window_->Create();
+}
+
+void LuaControleScript::getSaveData(std::ostream& os)
+{
+	auto L = lua_.get();
+	
+	// 関数を積む
+	lua_getglobal(L, "export_save_data");
+	// 引数を積む
+	// 呼び出す
+	// lua_pcall(L, 引数, 戻り値, ?)
+	if(lua_pcall(L, 0, 1, 0))	throw LuaCantCallFuncError(luaL_checkstring(L, -1));
+
+	os << luaL_checkstring(L, -1);
+}
+
+void LuaControleScript::restoreSaveData(std::istream& is)
+{
+	auto L = lua_.get();
+
+	is.seekg(0, std::ios_base::end);
+	int pos = is.tellg();
+	std::shared_ptr<char> buf(new char[pos + 1], std::default_delete<char[]>());
+	is.seekg(0, std::ios_base::beg);
+	is.read(buf.get(), pos);
+	buf.get()[pos] = '\0';
+
+	// 関数を積む
+	lua_getglobal(L, "import_save_data");
+	// 引数を積む
+	lua_pushstring(L, buf.get());
+	// 呼び出す
+	// lua_pcall(L, 引数, 戻り値, ?)
+	if(lua_pcall(L, 1, 0, 0))	throw LuaCantCallFuncError(luaL_checkstring(L, -1));
+
 }
 
 void LuaControleScript::onUserButton(int index, int id)
@@ -211,13 +250,8 @@ int LuaControleScript::luaCreateSystemButton(lua_State *L)
 	thisPtr_->window_->registerSystemButton(ButtonData(luaL_checkint(L, 1), luaL_checkstring(L, 2)));
 }
 
-int LuaControleScript::luaSetUserButtonState(lua_State *L)
+int LuaControleScript::luaSave(lua_State *L)
 {
-	thisPtr_->window_->setUserButtonState(luaL_checkint(L, 1), luaL_checkint(L, 2), checkboolean(L, 3));
-}
-
-int LuaControleScript::luaSetSystemButtonState(lua_State *L)
-{
-	thisPtr_->window_->setSystemButtonState(luaL_checkint(L, 1), checkboolean(L, 2));
+	thisPtr_->ash_.save();
 }
 

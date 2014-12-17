@@ -8,6 +8,18 @@ WRONG_LIMIT = 3
 suc_correct, suc_wrong = {}, {}
 suc_correct_info, suc_wrong_indexes = {}, {}
 
+function export_save_data()
+	return ash_helper.serialize(ash_helper.create_twin_table('suc_correct', 'suc_wrong', 'suc_correct_info', 'suc_wrong_indexes'))
+end
+
+function import_save_data(str)
+	local data = ash_helper.deserialize(str)
+	suc_correct = data.suc_correct
+	suc_wrong = data.suc_wrong
+	suc_correct_info = data.suc_correct_info
+	suc_wrong_indexes = data.suc_wrong_indexes
+end
+
 function initialize()
 	-- create user buttons
 	ash_helper.create_user_buttons('CORRECT', 'WRONG')
@@ -19,7 +31,7 @@ function initialize()
 	return {
 		answer = ANSWER,
 		winner = WINNER,
-		title = '3rd Round 1st step',
+		title = '3rd Round 1st step First set',
 		subtitle = 'ÉRÅ[ÉXÉ¿ Wonder zone',
 		quizid = 102,
 		org_user = ash_helper.all_zero_user
@@ -27,12 +39,16 @@ function initialize()
 end
 
 function on_system_button(id)
+	ash.save()
+
 	if id == 1 then	-- finish
 		ash_helper.finish(ANSWER, WINNER)
 	end
 end
 
 function on_user_button(index, id)
+	ash.save()
+
 	local user, data, info = ash.get_user(index), {}, {}
 
 	if id == 1 then	-- correct
@@ -70,6 +86,9 @@ function on_user_button(index, id)
 			table.insert(info, 2)
 		end
 
+		if suc_correct_info.index == index then
+			suc_correct_info.index = 0
+		end
 	end
 
 	ash.set_user(index, data, info)
