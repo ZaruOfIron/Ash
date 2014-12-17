@@ -5,6 +5,7 @@ WINNER = 1
 CHALLENGE_SCORE = 5
 
 now_challenging = false
+seed_indexes = {}
 
 function initialize()
 	-- create user buttons
@@ -14,8 +15,8 @@ function initialize()
 	return {
 		answer = ANSWER,
 		winner = WINNER,
-		title = '?th stage',
-		subtitle = '通過封筒',
+		title = '3rd Round 2nd step',
+		subtitle = 'Final set 通過ぁ？ミトメラレナイワァ!!',
 		quizid = 205,
 		org_user = ash_helper.all_zero_user
 	}
@@ -33,17 +34,26 @@ function on_user_button(index, id)
 		else
 			data.score = user.score + 1
 			if data.score >= CHALLENGE_SCORE then
-				now_challenging = true
+				if ash_helper.search_array(seed_indexes, index) then
+					table.insert(info, 1)
+				else
+					now_challenging = true
+				end
 			end
 		end
 	elseif id == 2 then	-- wrong
 		data.wrong = user.wrong + 1
 
 		if now_challenging then
-			data.score = 3
+			data.score = CHALLENGE_SCORE - 2
 			now_challenging = false
+			table.insert(seed_indexes, index)
 		else
 			data.score = user.score - 1
+		end
+
+		if data.wrong >= 3 then
+			table.insert(info, 2)
 		end
 	end
 
