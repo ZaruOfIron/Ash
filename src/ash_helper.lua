@@ -63,17 +63,17 @@ function value2str(v)
 	local vt = type(v)
 
 	local conv_table = {
-		'nil' = function(v) return 'nil' end,
 		number = function(v) return string.format('%d', v) end,
 		string = function(v) return string.format('"%s"', v) end,
 		boolean = function(v) return (v == true and 'true' or 'false') end,
-		'function' = function(v) return '"*function"' end,
 		thread = function(v) return '"thread"' end,
 		userdata = function(v) return '"*userdata"' end
 	}
+	conv_table['nil'] = function(v) return 'nil' end
+	conv_table['function'] = function(v) return '"*function"' end
 
 	prod = conv_table[vt]
-	return prod == nil and '"UnsupportFormat"' or prod()
+	return prod == nil and '"UnsupportFormat"' or prod(v)
 end
 
 function field2str(v)
@@ -85,11 +85,11 @@ function field2str(v)
 	}
 
 	prod = conv_table[vt]
-	return prod == nil and 'UnknownField' or prod()
+	return prod == nil and 'UnknownField' or prod(v)
 end
 
 -- テーブルのシリアライズ
-function serialize_table(t)
+function serialize(t)
 	if not (type(t) == 'table') then return value2str(t) end
 
 	local buf = ''
