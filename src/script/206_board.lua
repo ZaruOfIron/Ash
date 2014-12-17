@@ -16,8 +16,8 @@ function initialize()
 	return {
 		answer = ANSWER,
 		winner = WINNER,
-		title = '?th stage',
-		subtitle = 'ボード',
+		title = '3rd Round 3rd step Quarter final',
+		subtitle = 'コースα 何それ？ｲﾐﾜｶﾝﾅｲ',
 		quizid = 206,
 		org_user = ash_helper.all_zero_user
 	}
@@ -45,7 +45,16 @@ function on_system_button(id)
 	elseif id == 2 then	-- clear
 		checked_users = {}
 	elseif id == 3 then	-- finish
-		ash_helper.finish(ANSWER, WINNER)
+		local users = ash_helper.get_all_users(ANSWER)
+		table.sort(users,
+			function(a, b)
+				if a.score ~= b.score then return a.score > b.score end
+				if a.correct ~= b.correct then return a.correct > b.correct end
+				return a.index < b.index
+			end)
+		for i = 1, WINNER do
+			ash.set_user(users[i].index, {}, {1})
+		end
 	end
 end
 
