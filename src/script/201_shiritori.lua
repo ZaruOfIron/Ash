@@ -14,8 +14,8 @@ function initialize()
 	return {
 		answer = ANSWER,
 		winner = WINNER,
-		title = '2nd stage',
-		subtitle = 'ÇµÇËÇ∆ÇË',
+		title = '3rd Round 1st step',
+		subtitle = 'ÉRÅ[ÉXÉø ENDLESS PARADE',
 		quizid = 201,
 		org_user = ash_helper.all_zero_user
 	}
