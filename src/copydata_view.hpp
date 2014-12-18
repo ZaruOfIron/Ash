@@ -10,7 +10,6 @@ class CopyDataView : public View
 private:
 	HWND hTarget_;
 
-	void sendData(int id, const std::string& str);
 
 public:
 	CopyDataView(const std::string& targetTitle);
@@ -21,6 +20,9 @@ public:
 	void sendUserModified(int index, const User& user, int modIndex);
 	void sendInfo(int id);
 	void sendInfo(const std::string& str);
+
+private:
+	void sendData(int id, const std::string& str);
 };
 
 

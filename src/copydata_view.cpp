@@ -14,27 +14,6 @@ bool CopyDataView::isTargetValid()
 	return hTarget_ != NULL && ::IsWindow(hTarget_);
 }
 
-#include <iostream>
-void CopyDataView::sendData(int id, const std::string& str)
-{
-	std::cout << id << ": " << str << std::endl;
-
-	// const‰ñ”ð
-	std::shared_ptr<char> data(new char[str.size()], std::default_delete<char[]>());
-	std::memcpy(data.get(), str.c_str(), str.size());
-
-	COPYDATASTRUCT msg;
-	msg.dwData = id;
-	msg.cbData = str.size();
-	msg.lpData = data.get();
-
-	::SendMessage(
-		hTarget_,
-		WM_COPYDATA,
-		NULL,
-		reinterpret_cast<LPARAM>(&msg));
-}
-
 void CopyDataView::initialize(int answerNumber, int winnerNumber, const std::string& title, const std::string& subtitle, int quizId, const User& orgUser)
 {
 	// Initialize Phase
@@ -54,5 +33,26 @@ void CopyDataView::sendInfo(int id)
 void CopyDataView::sendInfo(const std::string& str)
 {
 	sendData(401, str);
+}
+
+#include <iostream>
+void CopyDataView::sendData(int id, const std::string& str)
+{
+	std::cout << id << ": " << str << std::endl;
+
+	// const‰ñ”ð
+	std::shared_ptr<char> data(new char[str.size()], std::default_delete<char[]>());
+	std::memcpy(data.get(), str.c_str(), str.size());
+
+	COPYDATASTRUCT msg;
+	msg.dwData = id;
+	msg.cbData = str.size();
+	msg.lpData = data.get();
+
+	::SendMessage(
+		hTarget_,
+		WM_COPYDATA,
+		NULL,
+		reinterpret_cast<LPARAM>(&msg));
 }
 
