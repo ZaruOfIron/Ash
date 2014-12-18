@@ -49,6 +49,7 @@ private:
 	{
 		std::vector<User> *users;
 		std::vector<PrevMsg> *prevMsgs;
+		std::vector<int> *msgOrders;
 		std::string luaVars;
 
 	private:
@@ -56,7 +57,7 @@ private:
 		template<class Archive>
 			void serialize(Archive& ar, const unsigned int version)
 			{
-				ar & users & prevMsgs & luaVars;
+				ar & users & prevMsgs & msgOrders & luaVars;
 			}
 	};
 

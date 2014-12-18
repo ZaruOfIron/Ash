@@ -44,6 +44,7 @@ void Ash::makeSaveData(SaveData& data)
 {
 	data.users = &users_;
 	data.prevMsgs = &prevMsgs_;
+	data.msgOrders = &msgOrders_;
 
 	std::ostringstream oss;	controler_->getSaveData(oss);
 	data.luaVars = oss.str();
@@ -53,6 +54,9 @@ void Ash::setSaveData(const SaveData& data)
 {
 	users_ = *(data.users);
 	delete data.users;
+
+	msgOrders_ = *(data.msgOrders);
+	delete data.msgOrders;
 
 	prevMsgs_ = *(data.prevMsgs);
 	delete data.prevMsgs;	// newed by boost::serialization
