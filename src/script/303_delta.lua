@@ -42,6 +42,7 @@ function on_user_button(index, id)
 
 		if suc_index == index then	-- ˜A“š
 			dir_count = (dir_count + 1) % 2
+			table.insert(info, 30301 + dir_count)
 		else
 			suc_index = index
 		end
