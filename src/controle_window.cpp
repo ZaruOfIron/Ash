@@ -20,6 +20,21 @@ void ControleWindow::registerSystemButton(const ButtonData& data)
 	systemForm_.push_back(data);
 }
 
+LRESULT ControleWindow::WndProc(UINT uMsg, WPARAM wParam, LPARAM lParam)
+{
+	switch(uMsg)
+	{
+	case WM_CREATE:
+		OnCreate();
+		return 0;
+	case WM_DESTROY:
+		OnDestroy();
+		return 0;
+	}
+
+	return WndProcDefault(uMsg, wParam, lParam);
+}
+
 void ControleWindow::setClientSize(int width, int height)
 {
 	CRect rw = GetWindowRect(), rc = GetClientRect();
@@ -116,20 +131,5 @@ BOOL ControleWindow::OnCommand(WPARAM wParam, LPARAM lParam)
 	}
 
 	return TRUE;
-}
-
-LRESULT ControleWindow::WndProc(UINT uMsg, WPARAM wParam, LPARAM lParam)
-{
-	switch(uMsg)
-	{
-	case WM_CREATE:
-		OnCreate();
-		return 0;
-	case WM_DESTROY:
-		OnDestroy();
-		return 0;
-	}
-
-	return WndProcDefault(uMsg, wParam, lParam);
 }
 

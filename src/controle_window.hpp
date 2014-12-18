@@ -29,15 +29,7 @@ private:
 		FORM_PART_WIDTH = 100,
 		FORM_PART_HEIGHT = 40,
 	};
-
-	void setClientSize(int width, int height);
-
-	// message crackers
-	void OnCreate();
-	//void OnInitialUpdate();
-	void OnDestroy();
-	BOOL OnCommand(WPARAM wParam, LPARAM lParam);
-
+	
 public:
 	ControleWindow(LuaControleScript *controler);
 
@@ -47,6 +39,16 @@ public:
 	void registerSystemButton(const ButtonData& data);
 
 	LRESULT WndProc(UINT uMsg, WPARAM wParam, LPARAM lParam);
+
+private:
+	void setClientSize(int width, int height);
+
+	// message crackers
+	void OnCreate();
+	//void OnInitialUpdate();
+	void OnDestroy();
+	BOOL OnCommand(WPARAM wParam, LPARAM lParam);
+
 };
 
 
