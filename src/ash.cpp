@@ -1,6 +1,7 @@
 #include "ash.hpp"
 #include "lua_controle_script.hpp"
 #include "copydata_view.hpp"
+#include "log_window.hpp"
 #include "resource.h"
 #include <boost/archive/text_oarchive.hpp>
 #include <boost/archive/text_iarchive.hpp>
@@ -13,6 +14,9 @@ Ash::Ash()
 {
 	log_.reset(new LogWindow(*this, ID_DIALOG));
 }
+
+Ash::~Ash()
+{}
 
 void Ash::setScript(const std::string& filename)
 {

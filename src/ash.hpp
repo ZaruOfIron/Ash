@@ -2,12 +2,16 @@
 #define ___ASH_HPP___
 
 #include "user.hpp"
-#include "controle_script.hpp"
-#include "view.hpp"
 #include "log_window.hpp"
+#include <boost/serialization/vector.hpp>
 #include <memory>
 #include <vector>
 #include <wincore.h>
+
+class LogWindow;
+class ControleScript;
+class UserUpdateMessage;
+class View;
 
 class Ash : private CWinApp
 {
@@ -60,6 +64,7 @@ private:
 
 public:
 	Ash();
+	~Ash();
 
 	// Call from main()
 	void setScript(const std::string& filename);

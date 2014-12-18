@@ -15,7 +15,7 @@ void LogWindow::write(const std::string& msg)
 	logEdit_.ReplaceSel("\r\n", FALSE);
 }
 
-std::string LogWindow::askFileOpen(char *defaultExtention, char *filter, char *title)
+std::string LogWindow::askFileOpen(const char *defaultExtention, const char *filter, const char *title)
 {
 	static OPENFILENAME ofn;
 	static char path[MAX_PATH], file[MAX_PATH];
@@ -36,7 +36,7 @@ std::string LogWindow::askFileOpen(char *defaultExtention, char *filter, char *t
 	return std::string("");
 }
 
-std::string LogWindow::askFileSave(char *defaultExtension, char *filter, char *title)
+std::string LogWindow::askFileSave(const char *defaultExtention, const char *filter, const char *title)
 {
 	static OPENFILENAME ofn;
 	static char path[MAX_PATH], file[MAX_PATH];
@@ -48,7 +48,7 @@ std::string LogWindow::askFileSave(char *defaultExtension, char *filter, char *t
 	ofn.lpstrInitialDir = path;
 	ofn.lpstrFile = file;
 	ofn.nMaxFile = MAX_PATH;
-	ofn.lpstrDefExt = defaultExtension;
+	ofn.lpstrDefExt = defaultExtention;
 	ofn.lpstrFilter = filter;
 	ofn.lpstrTitle = title;
 	ofn.Flags = OFN_PATHMUSTEXIST | OFN_OVERWRITEPROMPT;

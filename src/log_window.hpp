@@ -21,8 +21,8 @@ public:
 	void write(const std::string& msg);
 
 private:
-	std::string askFileOpen(char *defaultExtension, char *filter, char *title);
-	std::string askFileSave(char *defaultExtension, char *filter, char *title);
+	std::string askFileOpen(const char *defaultExtention, const char *filter, const char *title);
+	std::string askFileSave(const char *defaultExtention, const char *filter, const char *title);
 
 	BOOL OnInitDialog();
 	BOOL OnCommand(WPARAM wParam, LPARAM lParam);
