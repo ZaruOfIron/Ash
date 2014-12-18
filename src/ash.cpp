@@ -42,20 +42,20 @@ void Ash::run()
 
 void Ash::makeSaveData(SaveData& data)
 {
-	save.users = &users_;
-	save.prevMsgs = &prevMsgs_;
+	data.users = &users_;
+	data.prevMsgs = &prevMsgs_;
 
 	std::ostringstream oss;	controler_->getSaveData(oss);
-	save.luaVars = oss.str();
+	data.luaVars = oss.str();
 }
 
 void Ash::setSaveData(const SaveData& data)
 {
-	users_ = *(save.users);
-	delete save.users;
+	users_ = *(data.users);
+	delete data.users;
 
-	prevMsgs_ = *(save.prevMsgs);
-	delete save.prevMsgs;	// newed by boost::serialization
+	prevMsgs_ = *(data.prevMsgs);
+	delete data.prevMsgs;	// newed by boost::serialization
 	// メッセージを送る順番を算出する
 	std::list<std::pair<int, int>> order;
 	for(int i = 0;i < msgOrders_.size();i++)	order.push_back(std::make_pair(i, msgOrders_.at(i)));
@@ -69,7 +69,7 @@ void Ash::setSaveData(const SaveData& data)
 		for(int id : msg.info)	view_->sendInfo(id);
 	}
 
-	iss.str(save.luaVars);	iss.clear(std::istringstream::goodbit);
+	std::istringstream iss(data.luaVars);
 	controler_->restoreSaveData(iss);
 }
 
@@ -81,7 +81,7 @@ void Ash::save()
 	SaveData save;
 	makeSaveData(save);
 	
-	oss.str("");
+	std::ostringstream oss;
 	boost::archive::text_oarchive oa(oss);
 	oa << save;
 	saves_.push_back(oss.str());
@@ -103,14 +103,14 @@ void Ash::writeSaveData(std::ostream& os)
 {
 	SaveData data;	makeSaveData(data);
 	boost::archive::text_oarchive oa(os);
-	oa << save;
+	oa << data;
 }
 
 void Ash::readSaveData(std::istream& is)
 {
 	boost::archive::text_iarchive ia(is);
-	SaveData save;	ia >> save;
-	setSaveData(save);
+	SaveData data;	ia >> data;
+	setSaveData(data);
 }
 
 const User& Ash::getUser(int index) const
