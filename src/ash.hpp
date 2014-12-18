@@ -9,19 +9,9 @@
 #include <vector>
 #include <wincore.h>
 
-std::string getDateTimeString();
-
 class Ash : private CWinApp
 {
 private:
-	std::vector<User> users_;
-	std::unique_ptr<ControleScript> controler_;
-	std::unique_ptr<View> view_;
-	std::unique_ptr<LogWindow> log_;
-	int winner_;
-	std::string saveFileName_;
-	std::vector<std::string> saves_;
-
 	struct PrevMsg
 	{
 		User user;
@@ -41,15 +31,12 @@ private:
 			}
 
 	};
-	std::vector<PrevMsg> prevMsgs_;
-	int nowMsgOrder_;
-	std::vector<int> msgOrders_;
 
 	struct SaveData
 	{
 		std::vector<User> *users;
-		std::vector<PrevMsg> *prevMsgs;
 		std::vector<int> *msgOrders;
+		std::vector<PrevMsg> *prevMsgs;
 		std::string luaVars;
 
 	private:
@@ -57,10 +44,41 @@ private:
 		template<class Archive>
 			void serialize(Archive& ar, const unsigned int version)
 			{
-				ar & users & prevMsgs & msgOrders & luaVars;
+				ar & users & msgOrders & prevMsgs & luaVars;
 			}
 	};
 
+	std::vector<User> users_;
+	std::unique_ptr<ControleScript> controler_;
+	std::unique_ptr<View> view_;
+	std::unique_ptr<LogWindow> log_;
+	int winner_;
+	std::vector<std::string> saves_;
+	int nowMsgOrder_;
+	std::vector<int> msgOrders_;
+	std::vector<PrevMsg> prevMsgs_;
+
+public:
+	Ash();
+
+	// Call from main()
+	void setScript(const std::string& filename);
+	void run();
+
+	// Call from log window
+	void writeSaveData(std::ostream& os);
+	void readSaveData(std::istream& is);
+	void undo();
+
+	// Call from controle script
+	void initialize(int answer, int winner, const std::string& title, const std::string& subtitle, int quizId, const User& orgUser);
+	void update(const UserUpdateMessage& msg);
+	void save();
+
+	const User& getUser(int index) const;
+	bool hasFinished() const;
+
+private:
 	void makeSaveData(SaveData& data);
 	void setSaveData(const SaveData& data);
 
@@ -72,23 +90,6 @@ private:
 		LOSE_FINISH	// îsëﬁé“ÇÃêßå¿ìûíBÇ…ÇÊÇÈèIóπ
 	};
 	FINISH_STATUS getFinishStatus() const;
-public:
-	Ash();
-
-	void setScript(const std::string& filename);
-	void run();
-
-	void writeSaveData(std::ostream& os);
-	void readSaveData(std::istream& is);
-
-	void save();
-	void undo();
-
-	const User& getUser(int index) const;
-	bool hasFinished() const;
-
-	void luaInitialize(int answer, int winner, const std::string& title, const std::string& subtitle, int quizId, const User& orgUser);
-	void luaUpdate(const UserUpdateMessage& msg);
 };
 
 
