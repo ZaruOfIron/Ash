@@ -60,6 +60,9 @@ private:
 			}
 	};
 
+	void makeSaveData(SaveData& data);
+	void setSaveData(const SaveData& data);
+
 	// クイズの終了確認を行う
 	// 戻り値が
 	enum class FINISH_STATUS {
@@ -73,6 +76,10 @@ public:
 
 	void setScript(const std::string& filename);
 	void run();
+
+	void writeSaveData(std::ostream& os);
+	void readSaveData(std::istream& is);
+
 	void save();
 	void undo();
 

@@ -40,19 +40,48 @@ void Ash::run()
 	Run();
 }
 
+void Ash::makeSaveData(SaveData& data)
+{
+	data.users = &users_;
+	data.prevMsgs = &prevMsgs_;
+
+	std::ostringstream oss;	controler_->getSaveData(oss);
+	data.luaVars = oss.str();
+}
+
+void Ash::setSaveData(const SaveData& data)
+{
+	users_ = *(data.users);
+	delete data.users;
+
+	prevMsgs_ = *(data.prevMsgs);
+	delete data.prevMsgs;	// newed by boost::serialization
+	// メッセージを送る順番を算出する
+	std::list<std::pair<int, int>> order;
+	for(int i = 0;i < msgOrders_.size();i++)	order.push_back(std::make_pair(i, msgOrders_.at(i)));
+	order.sort([](const std::pair<int, int>& lhs, const std::pair<int, int>& rhs) { return lhs.second < rhs.second; });
+	// 順番どおりに送っていく
+	for(auto& item : order){
+		int index = item.first;
+		auto& msg = prevMsgs_.at(index);
+
+		view_->sendUserModified(index, msg.user, msg.modIndex);
+		for(int id : msg.info)	view_->sendInfo(id);
+	}
+
+	std::istringstream iss(data.luaVars);
+	controler_->restoreSaveData(iss);
+}
+
 void Ash::save()
 {
 	log_->write("Ash::save()");
 
 	// 保存処理
 	SaveData save;
-	save.users = &users_;
-	save.prevMsgs = &prevMsgs_;
-
-	std::ostringstream oss;	controler_->getSaveData(oss);
-	save.luaVars = oss.str();
-
-	oss.str("");
+	makeSaveData(save);
+	
+	std::ostringstream oss;
 	boost::archive::text_oarchive oa(oss);
 	oa << save;
 	saves_.push_back(oss.str());
@@ -67,27 +96,21 @@ void Ash::undo()
 	std::istringstream iss(saves_.back());	saves_.pop_back();
 	boost::archive::text_iarchive ia(iss);
 	SaveData save;	ia >> save;
+	setSaveData(save);
+}
 
-	users_ = *(save.users);
-	delete save.users;
+void Ash::writeSaveData(std::ostream& os)
+{
+	SaveData data;	makeSaveData(data);
+	boost::archive::text_oarchive oa(os);
+	oa << data;
+}
 
-	prevMsgs_ = *(save.prevMsgs);
-	delete save.prevMsgs;	// newed by boost::serialization
-	// メッセージを送る順番を算出する
-	std::list<std::pair<int, int>> order;
-	for(int i = 0;i < msgOrders_.size();i++)	order.push_back(std::make_pair(i, msgOrders_.at(i)));
-	order.sort([](const std::pair<int, int>& lhs, const std::pair<int, int>& rhs) { return lhs.second < rhs.second; });
-	// 順番どおりに送っていく
-	for(auto& item : order){
-		int index = item.first;
-		auto& msg = prevMsgs_.at(index);
-
-		view_->sendUserModified(index, msg.user, msg.modIndex);
-		for(int id : msg.info)	view_->sendInfo(id);
-	}
-
-	iss.str(save.luaVars);	iss.clear(std::istringstream::goodbit);
-	controler_->restoreSaveData(iss);
+void Ash::readSaveData(std::istream& is)
+{
+	boost::archive::text_iarchive ia(is);
+	SaveData data;	ia >> data;
+	setSaveData(data);
 }
 
 const User& Ash::getUser(int index) const

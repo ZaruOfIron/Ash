@@ -5,3 +5,5 @@
 #define ID_DIALOG                               100
 #define ID_LOGEDIT                              40000
 #define ID_UNDO                                 40001
+#define ID_SAVEDATA                             40002
+#define ID_RESTOREDATA                          40003
