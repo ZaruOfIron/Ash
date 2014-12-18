@@ -26,7 +26,7 @@ function initialize()
 		winner = 1,
 		title = '3rd Round 3rd step Final',
 		subtitle = 'KiRa-KiRa Sensation',
-		quizid = 202,
+		quizid = 303,
 		org_user = ash_helper.all_zero_user
 	}
 end
