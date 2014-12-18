@@ -50,7 +50,7 @@ function on_user_button(index, id)
 					table.insert(info, 1)
 				else
 					now_challenging = true
-					table.insert(info, 20501)
+					table.insert(info, 10301)
 				end
 			end
 		end
