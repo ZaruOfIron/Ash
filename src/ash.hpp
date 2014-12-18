@@ -60,6 +60,9 @@ private:
 			}
 	};
 
+	void makeSaveData(SaveData& data);
+	void setSaveData(const SaveData& data);
+
 	// クイズの終了確認を行う
 	// 戻り値が
 	enum class FINISH_STATUS {

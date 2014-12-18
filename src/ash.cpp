@@ -40,34 +40,17 @@ void Ash::run()
 	Run();
 }
 
-void Ash::save()
+void Ash::makeSaveData(SaveData& data)
 {
-	log_->write("Ash::save()");
-
-	// •Û‘¶ˆ—
-	SaveData save;
 	save.users = &users_;
 	save.prevMsgs = &prevMsgs_;
 
 	std::ostringstream oss;	controler_->getSaveData(oss);
 	save.luaVars = oss.str();
-
-	oss.str("");
-	boost::archive::text_oarchive oa(oss);
-	oa << save;
-	saves_.push_back(oss.str());
 }
 
-void Ash::undo()
+void Ash::setSaveData(const SaveData& data)
 {
-	if(saves_.size() == 0)	return;
-
-	log_->write("Ash::undo()");
-
-	std::istringstream iss(saves_.back());	saves_.pop_back();
-	boost::archive::text_iarchive ia(iss);
-	SaveData save;	ia >> save;
-
 	users_ = *(save.users);
 	delete save.users;
 
@@ -88,6 +71,32 @@ void Ash::undo()
 
 	iss.str(save.luaVars);	iss.clear(std::istringstream::goodbit);
 	controler_->restoreSaveData(iss);
+}
+
+void Ash::save()
+{
+	log_->write("Ash::save()");
+
+	// •Û‘¶ˆ—
+	SaveData save;
+	makeSaveData(save);
+	
+	oss.str("");
+	boost::archive::text_oarchive oa(oss);
+	oa << save;
+	saves_.push_back(oss.str());
+}
+
+void Ash::undo()
+{
+	if(saves_.size() == 0)	return;
+
+	log_->write("Ash::undo()");
+
+	std::istringstream iss(saves_.back());	saves_.pop_back();
+	boost::archive::text_iarchive ia(iss);
+	SaveData save;	ia >> save;
+	setSaveData(save);
 }
 
 const User& Ash::getUser(int index) const
