@@ -28,6 +28,8 @@ private:
 	enum {
 		FORM_PART_WIDTH = 100,
 		FORM_PART_HEIGHT = 40,
+
+		FORM_PARTS_WIDTH_NUM = 4,
 	};
 	
 public:

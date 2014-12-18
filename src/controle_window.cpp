@@ -49,7 +49,7 @@ void ControleWindow::OnCreate()
 	int scrWidth = 0, scrHeight = 0;
 	// User Form‚ğİ’u
 	for(int i = 0;i < answer_;i++){
-		int nx = i % 6, ny = i / 6;
+		int nx = i % FORM_PARTS_WIDTH_NUM, ny = i / FORM_PARTS_WIDTH_NUM;
 		CRect rect(
 			10 + nx * (FORM_PART_WIDTH + 20),
 			10 + (FORM_PART_HEIGHT + 10) * (userForm_.size() + 1) * ny,
@@ -87,7 +87,7 @@ void ControleWindow::OnCreate()
 	// System Form‚ğİ’u
 	int systemY = scrHeight;
 	for(int i = 0;i < systemForm_.size();i++){
-		int nx = i % 6, ny = i / 6;
+		int nx = i % FORM_PARTS_WIDTH_NUM, ny = i / FORM_PARTS_WIDTH_NUM;
 
 		CRect rect(
 			10 + nx * (FORM_PART_WIDTH + 20),
