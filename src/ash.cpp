@@ -65,7 +65,8 @@ void Ash::setSaveData(const SaveData& data)
 		int index = item.first;
 		auto& msg = prevMsgs_.at(index);
 
-		view_->sendUserModified(index, msg.user, msg.modIndex);
+		//view_->sendUserModified(index, msg.user, msg.modIndex);
+		view_->sendUserModified(index, msg.user, 0x0f);
 		for(int id : msg.info)	view_->sendInfo(id);
 	}
 
