@@ -28,7 +28,7 @@ function initialize()
 		winner = WINNER,
 		title = '3rd Round 2nd step Final set',
 		subtitle = '通過ぁ？ミトメラレナイワァ!!',
-		quizid = 205,
+		quizid = 103,
 		org_user = ash_helper.all_zero_user
 	}
 end
