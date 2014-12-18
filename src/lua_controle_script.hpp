@@ -5,7 +5,6 @@
 #include <lua.hpp>
 #include <memory>
 #include <string>
-#include <vector>
 
 class Ash;
 class ControleWindow;
@@ -20,6 +19,21 @@ private:
 	static LuaControleScript *thisPtr_;
 	int answer_;
 
+public:
+	LuaControleScript(Ash& ash, const std::string& filename);
+	~LuaControleScript();
+	
+	// Call from Ash
+	void initialize();
+	void getSaveData(std::ostream& os);
+	void restoreSaveData(std::istream& is);
+
+	// Call from ControleWindow
+	void onUserButton(int index, int id);
+	void onSystemButton(int id);
+	void onName(int index, const std::string& name);
+
+private:
 	static bool checkboolean(lua_State *L, int index);
 
 	static int luaGetUser(lua_State *L);
@@ -27,19 +41,6 @@ private:
 	static int luaCreateUserButton(lua_State *L);
 	static int luaCreateSystemButton(lua_State *L);
 	static int luaSave(lua_State *L);
-
-public:
-	LuaControleScript(Ash& ash, const std::string& filename);
-	~LuaControleScript();
-	
-	void initialize();
-
-	void getSaveData(std::ostream& os);
-	void restoreSaveData(std::istream& is);
-
-	void onUserButton(int index, int id);
-	void onSystemButton(int id);
-	void onName(int index, const std::string& name);
 };
 
 #endif

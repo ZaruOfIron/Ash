@@ -2,12 +2,7 @@
 #include "lua_exception.hpp"
 #include "ash.hpp"
 #include "controle_window.hpp"
-#include <boost/serialization/map.hpp>
-#include <boost/archive/text_oarchive.hpp>
-#include <boost/archive/text_iarchive.hpp>
 #include <cassert>
-#include <map>
-
 
 LuaControleScript *LuaControleScript::thisPtr_ = nullptr;
 
@@ -91,7 +86,7 @@ void LuaControleScript::initialize()
 	lua_setfield(L, -2, "config");
 	lua_setglobal(L, "ash");
 
-	ash_.luaInitialize(answer_, winner, title, subtitle, quizId, orgUser);
+	ash_.initialize(answer_, winner, title, subtitle, quizId, orgUser);
 
 	window_->setAnswer(answer_);
 	window_->Create();
@@ -115,6 +110,7 @@ void LuaControleScript::restoreSaveData(std::istream& is)
 {
 	auto L = lua_.get();
 
+	// ‘S•”Žæ“¾‚·‚é
 	is.seekg(0, std::ios_base::end);
 	int pos = is.tellg();
 	std::shared_ptr<char> buf(new char[pos + 1], std::default_delete<char[]>());
@@ -129,7 +125,6 @@ void LuaControleScript::restoreSaveData(std::istream& is)
 	// ŒÄ‚Ño‚·
 	// lua_pcall(L, ˆø”, –ß‚è’l, ?)
 	if(lua_pcall(L, 1, 0, 0))	throw LuaCantCallFuncError(luaL_checkstring(L, -1));
-
 }
 
 void LuaControleScript::onUserButton(int index, int id)
@@ -175,7 +170,7 @@ void LuaControleScript::onName(int index, const std::string& name)
 	msg.index = index - 1;
 	msg.name = name;
 
-	thisPtr_->ash_.luaUpdate(msg);
+	thisPtr_->ash_.update(msg);
 }
 
 bool LuaControleScript::checkboolean(lua_State *L, int index)
@@ -235,7 +230,7 @@ int LuaControleScript::luaSetUser(lua_State *L)
 		}
 	}
 
-	thisPtr_->ash_.luaUpdate(msg);
+	thisPtr_->ash_.update(msg);
 
 	return 0;
 }
