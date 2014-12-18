@@ -3,6 +3,18 @@
 #include "ash.hpp"
 #include <fstream>
 
+LogWindow::LogWindow(Ash& ash, UINT nResID)
+	: CDialog(nResID), ash_(ash)
+{}
+
+void LogWindow::write(const std::string& msg)
+{
+	if(!logEdit_.IsWindow())	return;
+
+	logEdit_.ReplaceSel(msg.c_str(), FALSE);
+	logEdit_.ReplaceSel("\r\n", FALSE);
+}
+
 std::string LogWindow::askFileOpen(char *defaultExtention, char *filter, char *title)
 {
 	static OPENFILENAME ofn;
@@ -45,24 +57,6 @@ std::string LogWindow::askFileSave(char *defaultExtension, char *filter, char *t
 	return std::string("");
 }
 
-void LogWindow::OnSaveData()
-{
-	std::string file = askFileSave("asd", "asd(*.asd)\0*.asd\0All files(*.*)\0*.*\0\0", "Open Save Data");
-	if(file.empty())	return;
-
-	std::ofstream ofs(file);
-	ash_.writeSaveData(ofs);
-}
-
-void LogWindow::OnRestoreData()
-{
-	std::string file = askFileOpen("asd", "asd(*.asd)\0*.asd\0All files(*.*)\0*.*\0\0", "Open Save Data");
-	if(file.empty())	return;
-
-	std::ifstream ifs(file);
-	ash_.readSaveData(ifs);
-}
-
 BOOL LogWindow::OnInitDialog()
 {
 	AttachItem(ID_LOGEDIT, logEdit_);
@@ -88,11 +82,21 @@ BOOL LogWindow::OnCommand(WPARAM wParam, LPARAM lParam)
 	return FALSE;
 }
 
-void LogWindow::write(const std::string& msg)
+void LogWindow::OnSaveData()
 {
-	if(!logEdit_.IsWindow())	return;
+	std::string file = askFileSave("asd", "asd(*.asd)\0*.asd\0All files(*.*)\0*.*\0\0", "Open Save Data");
+	if(file.empty())	return;
 
-	logEdit_.ReplaceSel(msg.c_str(), FALSE);
-	logEdit_.ReplaceSel("\r\n", FALSE);
+	std::ofstream ofs(file);
+	ash_.writeSaveData(ofs);
+}
+
+void LogWindow::OnRestoreData()
+{
+	std::string file = askFileOpen("asd", "asd(*.asd)\0*.asd\0All files(*.*)\0*.*\0\0", "Open Save Data");
+	if(file.empty())	return;
+
+	std::ifstream ifs(file);
+	ash_.readSaveData(ifs);
 }
 
