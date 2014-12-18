@@ -76,6 +76,10 @@ public:
 
 	void setScript(const std::string& filename);
 	void run();
+
+	void writeSaveData(std::ostream& os);
+	void readSaveData(std::istream& is);
+
 	void save();
 	void undo();
 

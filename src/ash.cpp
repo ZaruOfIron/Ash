@@ -99,6 +99,20 @@ void Ash::undo()
 	setSaveData(save);
 }
 
+void Ash::writeSaveData(std::ostream& os)
+{
+	SaveData data;	makeSaveData(data);
+	boost::archive::text_oarchive oa(os);
+	oa << save;
+}
+
+void Ash::readSaveData(std::istream& is)
+{
+	boost::archive::text_iarchive ia(is);
+	SaveData save;	ia >> save;
+	setSaveData(save);
+}
+
 const User& Ash::getUser(int index) const
 {
 	return users_.at(index);
