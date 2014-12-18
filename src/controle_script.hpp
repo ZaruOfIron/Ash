@@ -2,9 +2,6 @@
 #define ___CONTROLE_SCRIPT_HPP___
 
 #include <boost/optional.hpp>
-#include <boost/serialization/string.hpp>
-#include <boost/serialization/vector.hpp>
-#include <boost/serialization/optional.hpp>
 #include <vector>
 #include <string>
 
