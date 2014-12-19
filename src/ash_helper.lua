@@ -1,6 +1,7 @@
 module('ash_helper', package.seeall)
 
 all_zero_user = { index = 0, correct = 0, wrong = 0, score = 0 }
+has_won_ai, has_lost_ai = 1, 2
 
 -- ˆø”‚Ì‡”Ô‚Ìindex‚ÅAuser button‚ğì¬‚·‚é
 function create_user_buttons(...)
