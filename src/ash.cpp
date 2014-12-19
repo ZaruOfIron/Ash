@@ -118,21 +118,30 @@ void Ash::update(const UserUpdateMessage& msg)
 	// ‡”Ô‚ğ“o˜^‚·‚é
 	msgOrders_.at(msg.index) = nowMsgOrder_++;
 
+	int winnerCount, loserCount;
+	getWLCount(winnerCount, loserCount);
+
 	prevMsg.info.clear();
 	for(int id : msg.info){
 		// Ÿ‚¿”²‚¯(1)‚Æ”s‘Ş(2)‚Í‹L˜^‚µ‚Ä‚¨‚­
-		if(id == 1)	user.status = User::STATUS::WINNER;
-		else if(id == 2)	user.status = User::STATUS::LOSER;
+		int sendId = id;
+		if(id == 1){
+			user.status = User::STATUS::WINNER;
+			sendId = 100 + ++winnerCount;
+		}
+		else if(id == 2){
+			user.status = User::STATUS::LOSER;
+			sendId = 200 + ++loserCount;
+		}
 
-		std::cout << "Ash::update()\t: send AI to " << msg.index << " (" << id << ")...   ";
-		view_->sendInfo(id);
+		std::cout << "Ash::update()\t: send AI to " << msg.index << " (" << sendId << ")...   ";
+		view_->sendInfo(sendId);
 		std::cout << "done." << std::endl;
-		prevMsg.info.push_back(id);
+		prevMsg.info.push_back(sendId);
 	}
 
 	// I‚í‚ê‚ÎAI—¹ˆ—‚ğs‚¤
-	FINISH_STATUS status = getFinishStatus();
-	if(status == FINISH_STATUS::WIN_FINISH){
+	if(winnerCount >= winner_){
 		std::cout << "Ash::update()\t: WIN_FINISH" << std::endl;
 		for(int i = 0;i < users_.size();i++){
 			auto& user = users_.at(i);
@@ -141,11 +150,11 @@ void Ash::update(const UserUpdateMessage& msg)
 
 			std::cout << "Ash::update()\t: send LOSE to " << i << " (" << user.name << ", " << user.correct << ", " << user.wrong << ", " << user.score << ", " << modIndex << ")...   ";
 			view_->sendUserModified(i, user, 0);
-			view_->sendInfo(2);
+			view_->sendInfo(200);
 			std::cout << "done." << std::endl;
 		}
 	}
-	else if(status == FINISH_STATUS::LOSE_FINISH){
+	else if(loserCount >= users_.size() - winner_){
 		std::cout << "Ash::update()\t: LOSE_FINISH" << std::endl;
 		for(int i = 0;i < users_.size();i++){
 			auto& user = users_.at(i);
@@ -154,7 +163,7 @@ void Ash::update(const UserUpdateMessage& msg)
 
 			std::cout << "Ash::update()\t: send WIN to " << i << " (" << user.name << ", " << user.correct << ", " << user.wrong << ", " << user.score << ", " << modIndex << ")...   ";
 			view_->sendUserModified(i, user, 0);
-			view_->sendInfo(1);
+			view_->sendInfo(100);
 			std::cout << "done." << std::endl;
 		}
 	}
