@@ -233,9 +233,11 @@ void Ash::setSaveData(const SaveData& data)
 	controler_->restoreSaveData(iss);
 }
 
-void Ash::getWLCount(int& winnerCount, int& loserCount)
+void Ash::getWLCount(int& winnerCount, int& loserCount) const
 {
-	for(auto& user : users_){
+	winnerCount = loserCount = 0;
+
+	for(const auto& user : users_){
 		if(user.status == User::STATUS::WINNER)	winnerCount++;
 		else if(user.status == User::STATUS::LOSER)	loserCount++;
 	}

@@ -86,7 +86,7 @@ private:
 	void makeSaveData(SaveData& data);
 	void setSaveData(const SaveData& data);
 
-	void getWLCount(int& winnerCount, int& loserCount);
+	void getWLCount(int& winnerCount, int& loserCount) const;
 	// クイズの終了確認を行う
 	// 戻り値が
 	enum class FINISH_STATUS {
