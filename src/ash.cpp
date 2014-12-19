@@ -57,12 +57,10 @@ void Ash::undo()
 {
 	if(saves_.size() == 0)	return;
 
-	std::cout << "Ash::undo()\t: reading and setting data" << std::endl;
+	std::cout << "Ash::undo()\t: start undo" << std::endl;
 	std::istringstream iss(saves_.back());	saves_.pop_back();
-	boost::archive::text_iarchive ia(iss);
-	SaveData save;	ia >> save;
-	setSaveData(save);
-	std::cout << "Ash::undo()\t: done." << std::endl;
+	readSaveData(iss);
+	std::cout << "Ash::undo()\t: complete undo." << std::endl;
 }
 
 void Ash::initialize(int answer, int winner, const std::string& title, const std::string& subtitle, int quizId, const User& orgUser)
@@ -165,16 +163,12 @@ void Ash::update(const UserUpdateMessage& msg)
 
 void Ash::save()
 {
-	std::cout << "Ash::save()\t: making and saving data to saves_" << std::endl;
-
+	std::cout << "Ash::save()\t: start to save" << std::endl;
 	// •Û‘¶ˆ—
-	SaveData save;
-	makeSaveData(save);
-	
 	std::ostringstream oss;
-	boost::archive::text_oarchive oa(oss);
-	oa << save;
+	writeSaveData(oss);
 	saves_.push_back(oss.str());
+	std::cout << "Ash::save()\t: complete save" << std::endl;
 }
 
 const User& Ash::getUser(int index) const
