@@ -35,7 +35,10 @@ private:
 public:
 	ControleWindow(LuaControleScript *controler);
 
+	int getAnswer() const;
 	void setAnswer(int answer);
+
+	void moveCursor(int index);
 
 	void registerUserButton(const ButtonData& data);
 	void registerSystemButton(const ButtonData& data);

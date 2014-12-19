@@ -1,13 +1,47 @@
 #include "controle_window.hpp"
 #include "lua_controle_script.hpp"
 
+class NameEdit : public CEdit
+{
+private:
+	ControleWindow& window_;
+	int index_;
+
+public:
+	NameEdit(ControleWindow& window, int index)
+		: window_(window), index_(index)
+	{}
+
+	LRESULT WndProc(UINT uMsg, WPARAM wParam, LPARAM lParam)
+	{
+		switch(uMsg)
+		{
+		case WM_KEYDOWN:
+			if(wParam == VK_TAB)	window_.moveCursor((index_ + 1) % window_.getAnswer());
+			break;
+		}
+
+		return WndProcDefault(uMsg, wParam, lParam);
+	}
+};
+
 ControleWindow::ControleWindow(LuaControleScript *controler)
 	: controler_(controler), answer_(0)
 {}
 
+int ControleWindow::getAnswer() const
+{
+	return answer_;
+}
+
 void ControleWindow::setAnswer(int answer)
 {
 	answer_ = answer;
+}
+
+void ControleWindow::moveCursor(int index)
+{
+	GetDlgItem(index << 8)->SetFocus();
 }
 
 void ControleWindow::registerUserButton(const ButtonData& data)
@@ -27,6 +61,9 @@ LRESULT ControleWindow::WndProc(UINT uMsg, WPARAM wParam, LPARAM lParam)
 	case WM_CREATE:
 		OnCreate();
 		return 0;
+	case WM_NAME_TAB:
+		OnTab();
+		break;
 	case WM_DESTROY:
 		OnDestroy();
 		return 0;
