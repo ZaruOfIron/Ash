@@ -1,7 +1,7 @@
 #include "ash.hpp"
 #include "lua_controle_script.hpp"
 #include "copydata_view.hpp"
-#include "log_window.hpp"
+#include "tool_window.hpp"
 #include "resource.h"
 #include <boost/archive/text_oarchive.hpp>
 #include <boost/archive/text_iarchive.hpp>
@@ -13,7 +13,7 @@
 Ash::Ash()
 	: users_(), controler_(), view_(new CopyDataView("AUAUA"))
 {
-	log_.reset(new LogWindow(*this, ID_DIALOG));
+	log_.reset(new ToolWindow(*this, ID_DIALOG));
 	std::cout << "Ash::Ash() : finish construction" << std::endl;
 }
 

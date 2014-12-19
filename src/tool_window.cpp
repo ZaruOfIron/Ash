@@ -1,13 +1,13 @@
-#include "log_window.hpp"
+#include "tool_window.hpp"
 #include "resource.h"
 #include "ash.hpp"
 #include <fstream>
 
-LogWindow::LogWindow(Ash& ash, UINT nResID)
+ToolWindow::ToolWindow(Ash& ash, UINT nResID)
 	: CDialog(nResID), ash_(ash)
 {}
 
-std::string LogWindow::askFileOpen(const char *defaultExtention, const char *filter, const char *title)
+std::string ToolWindow::askFileOpen(const char *defaultExtention, const char *filter, const char *title)
 {
 	static OPENFILENAME ofn;
 	static char path[MAX_PATH], file[MAX_PATH];
@@ -28,7 +28,7 @@ std::string LogWindow::askFileOpen(const char *defaultExtention, const char *fil
 	return std::string("");
 }
 
-std::string LogWindow::askFileSave(const char *defaultExtention, const char *filter, const char *title)
+std::string ToolWindow::askFileSave(const char *defaultExtention, const char *filter, const char *title)
 {
 	static OPENFILENAME ofn;
 	static char path[MAX_PATH], file[MAX_PATH];
@@ -49,12 +49,12 @@ std::string LogWindow::askFileSave(const char *defaultExtention, const char *fil
 	return std::string("");
 }
 
-BOOL LogWindow::OnInitDialog()
+BOOL ToolWindow::OnInitDialog()
 {
 	return FALSE;
 }
 
-BOOL LogWindow::OnCommand(WPARAM wParam, LPARAM lParam)
+BOOL ToolWindow::OnCommand(WPARAM wParam, LPARAM lParam)
 {
 	switch(LOWORD(wParam))
 	{
@@ -72,7 +72,7 @@ BOOL LogWindow::OnCommand(WPARAM wParam, LPARAM lParam)
 	return FALSE;
 }
 
-void LogWindow::OnSaveData()
+void ToolWindow::OnSaveData()
 {
 	std::string file = askFileSave("asd", "asd(*.asd)\0*.asd\0All files(*.*)\0*.*\0\0", "Open Save Data");
 	if(file.empty())	return;
@@ -81,7 +81,7 @@ void LogWindow::OnSaveData()
 	ash_.writeSaveData(ofs);
 }
 
-void LogWindow::OnRestoreData()
+void ToolWindow::OnRestoreData()
 {
 	std::string file = askFileOpen("asd", "asd(*.asd)\0*.asd\0All files(*.*)\0*.*\0\0", "Open Save Data");
 	if(file.empty())	return;

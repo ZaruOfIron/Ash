@@ -2,13 +2,12 @@
 #define ___ASH_HPP___
 
 #include "user.hpp"
-#include "log_window.hpp"
 #include <boost/serialization/vector.hpp>
 #include <memory>
 #include <vector>
 #include <wincore.h>
 
-class LogWindow;
+class ToolWindow;
 class ControleScript;
 class UserUpdateMessage;
 class View;
@@ -55,7 +54,7 @@ private:
 	std::vector<User> users_;
 	std::unique_ptr<ControleScript> controler_;
 	std::unique_ptr<View> view_;
-	std::unique_ptr<LogWindow> log_;
+	std::unique_ptr<ToolWindow> log_;
 	int winner_;
 	std::vector<std::string> saves_;
 	int nowMsgOrder_;

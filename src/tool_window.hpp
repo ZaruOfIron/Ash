@@ -9,13 +9,13 @@
 
 class Ash;
 
-class LogWindow : public CDialog
+class ToolWindow : public CDialog
 {
 private:
 	Ash& ash_;
 
 public:
-	LogWindow(Ash& ash, UINT nResID);
+	ToolWindow(Ash& ash, UINT nResID);
 	
 private:
 	std::string askFileOpen(const char *defaultExtention, const char *filter, const char *title);
