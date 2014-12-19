@@ -26,7 +26,7 @@ function initialize()
 		answer = ANSWER,
 		winner = WINNER,
 		title = '3rd Round 3rd step Quarter final',
-		subtitle = 'コースβ にっこにっこにー',
+		subtitle = 'コースβ にっこにっこに～♪',
 		quizid = 207,
 		org_user = ash_helper.all_zero_user
 	}

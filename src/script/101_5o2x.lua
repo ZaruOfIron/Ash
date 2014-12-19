@@ -24,7 +24,7 @@ function initialize()
 	return {
 		answer = ANSWER,
 		winner = WINNER,
-		title = '2nd Round —DŸ‚ğ–Úw‚µ‚Ä',
+		title = '2nd Round—DŸ‚ğ‚ß‚´‚µ‚Ä',
 		subtitle = '‚T›‚Q~˜A“š‚ ‚è',
 		quizid = 101,
 		org_user = ash_helper.all_zero_user
