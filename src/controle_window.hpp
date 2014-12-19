@@ -46,6 +46,7 @@ private:
 	void setClientSize(int width, int height);
 
 	// message crackers
+	void PreCreate(CREATESTRUCT& cs);
 	void OnCreate();
 	//void OnInitialUpdate();
 	void OnDestroy();

@@ -44,6 +44,12 @@ void ControleWindow::setClientSize(int width, int height)
 		SWP_NOMOVE | SWP_NOZORDER);
 }
 
+void ControleWindow::PreCreate(CREATESTRUCT& cs)
+{
+	cs.style &= ~(WS_THICKFRAME | WS_MAXIMIZEBOX | WS_MINIMIZEBOX);
+	cs.lpszName = "Ash";
+}
+
 void ControleWindow::OnCreate()
 {
 	int scrWidth = 0, scrHeight = 0;
