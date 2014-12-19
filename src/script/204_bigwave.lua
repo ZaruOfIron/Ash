@@ -51,7 +51,7 @@ function on_system_button(id)
 				return a.index < b.index
 			end)
 		for i = 1, WINNER do
-			ash.set_user(users[i].index, {}, {1})
+			ash_helper.send_win_without_order(i)
 		end
 	end
 end
@@ -81,7 +81,7 @@ function on_user_button(index, id)
 				if user ~= nil then
 					local s = user.score - 1
 					if s <= 0 then
-						ash.set_user(i, { score = 0 }, {2})
+						ash.set_user(i, { score = 0 }, {ash_helper.has_lost_ai})
 					else
 						ash.set_user(i, { score = s })
 					end
@@ -94,7 +94,7 @@ function on_user_button(index, id)
 
 		if data.score <= 0 then
 			data.score = 0
-			ash.set_user(index, data, {2})
+			ash.set_user(index, data, {ash_helper.has_lost_ai})
 		end
 	end
 	

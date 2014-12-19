@@ -47,12 +47,12 @@ function on_user_button(index, id)
 		data.correct = user.correct + 1
 
 		if challenging_index ~= 0 then
-			table.insert(info, 1)
+			table.insert(info, ash_helper.has_won_ai)
 			challenging_index = 0
 		else
 			if data.correct >= CHALLENGE_CORRECT then
 				if ash_helper.search_array(seed_indexes, index) then
-					table.insert(info, 1)
+					table.insert(info, ash_helper.has_won_ai)
 				else
 					challenging_index = index
 					table.insert(info, 10301)
@@ -68,7 +68,7 @@ function on_user_button(index, id)
 			data.wrong = user.wrong + 1
 
 			if data.wrong >= WRONG_LIMIT then
-				table.insert(info, 2)
+				table.insert(info, ash_helper.has_lost_ai)
 			end
 		end
 	end

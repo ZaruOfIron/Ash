@@ -50,12 +50,17 @@ function sort_users(users)
 		end)
 end
 
+-- ‡”Ô‚ğl‚¦‚È‚¢Ÿ‚¿”²‚¯‚ğ‘—‚é
+function send_win_without_order(index)
+	ash.set_user(index, {}, {100})
+end
+
 -- Finish‚Ìˆ—
 function finish(answer, winner)
 	local users = ash_helper.get_all_users(answer)
 	ash_helper.sort_users(users)
 	for i = 1, winner do
-		ash.set_user(users[i].index, {}, {1})
+		send_win_without_order(users[i].index)
 	end
 end
 

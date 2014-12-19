@@ -71,7 +71,7 @@ function on_user_button(index, id)
 
 		if data.correct >= CORRECT_LIMIT then	-- clear
 			data.correct = CORRECT_LIMIT
-			table.insert(info, 1)
+			table.insert(info, ash_helper.has_won_ai)
 		end
 	elseif id == 2 then	-- wrong
 		if ash_helper.search_array(suc_wrong_indexes, index) then	-- ˜AŒë“š
@@ -83,7 +83,7 @@ function on_user_button(index, id)
 
 		if data.wrong >= WRONG_LIMIT then	-- fail
 			data.wrong = WRONG_LIMIT
-			table.insert(info, 2)
+			table.insert(info, ash_helper.has_lost_ai)
 		end
 
 		if suc_correct_info.index == index then
