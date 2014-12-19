@@ -7,14 +7,6 @@ LogWindow::LogWindow(Ash& ash, UINT nResID)
 	: CDialog(nResID), ash_(ash)
 {}
 
-void LogWindow::write(const std::string& msg)
-{
-	if(!logEdit_.IsWindow())	return;
-
-	logEdit_.ReplaceSel(msg.c_str(), FALSE);
-	logEdit_.ReplaceSel("\r\n", FALSE);
-}
-
 std::string LogWindow::askFileOpen(const char *defaultExtention, const char *filter, const char *title)
 {
 	static OPENFILENAME ofn;
@@ -59,8 +51,6 @@ std::string LogWindow::askFileSave(const char *defaultExtention, const char *fil
 
 BOOL LogWindow::OnInitDialog()
 {
-	AttachItem(ID_LOGEDIT, logEdit_);
-
 	return FALSE;
 }
 

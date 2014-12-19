@@ -13,13 +13,10 @@ class LogWindow : public CDialog
 {
 private:
 	Ash& ash_;
-	CEdit logEdit_;
 
 public:
 	LogWindow(Ash& ash, UINT nResID);
 	
-	void write(const std::string& msg);
-
 private:
 	std::string askFileOpen(const char *defaultExtention, const char *filter, const char *title);
 	std::string askFileSave(const char *defaultExtention, const char *filter, const char *title);
