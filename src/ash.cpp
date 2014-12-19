@@ -5,6 +5,7 @@
 #include "resource.h"
 #include <boost/archive/text_oarchive.hpp>
 #include <boost/archive/text_iarchive.hpp>
+#include <iostream>
 #include <list>
 #include <utility>
 #include <sstream>
@@ -13,6 +14,7 @@ Ash::Ash()
 	: users_(), controler_(), view_(new CopyDataView("AUAUA"))
 {
 	log_.reset(new LogWindow(*this, ID_DIALOG));
+	std::cout << "Ash::Ash() : finish construction" << std::endl;
 }
 
 Ash::~Ash()
@@ -21,39 +23,46 @@ Ash::~Ash()
 void Ash::setScript(const std::string& filename)
 {
 	controler_.reset(new LuaControleScript(*this, filename));
+	std::cout << "Ash::setScript() : " + filename + "is being loaded...   ";
 	controler_->initialize();
+	std::cout << "Done." << std::endl;
 }
 
 void Ash::run()
 {
+	std::cout << "Ash::run() : start the system" << std::endl;
 	log_->DoModeless();
 	Run();
 }
 
 void Ash::writeSaveData(std::ostream& os)
 {
+	std::cout << "Ash::readSaveData() : making and saving save data...   ";
 	SaveData data;	makeSaveData(data);
 	boost::archive::text_oarchive oa(os);
 	oa << data;
+	std::cout << "Done." << std::endl;
 }
 
 void Ash::readSaveData(std::istream& is)
 {
+	std::cout << "Ash::readSaveData() : reading and setting save data...   ";
 	boost::archive::text_iarchive ia(is);
 	SaveData data;	ia >> data;
 	setSaveData(data);
+	std::cout << "Done." << std::endl;
 }
 
 void Ash::undo()
 {
 	if(saves_.size() == 0)	return;
 
-	log_->write("Ash::undo()");
-
+	std::cout << "Ash::undo() : reading and saving data...   ";
 	std::istringstream iss(saves_.back());	saves_.pop_back();
 	boost::archive::text_iarchive ia(iss);
 	SaveData save;	ia >> save;
 	setSaveData(save);
+	std::cout << "Done." << std::endl;
 }
 
 void Ash::initialize(int answer, int winner, const std::string& title, const std::string& subtitle, int quizId, const User& orgUser)
@@ -61,7 +70,12 @@ void Ash::initialize(int answer, int winner, const std::string& title, const std
 	winner_ = winner;
 	users_.resize(answer, orgUser);
 
+	std::cout << "Ash::initialize() :" << std::endl
+		<< "\t(ans, win, tit, sub, qid, org(c, w, s))" << std::endl
+		<< "\t(" << answer << ", " << winner << ", " << title << ", " << subtitle << ", " << quizId << ", (" << orgUser.correct << ", " << orgUser.wrong << ", " << orgUser.score << "))" << std::endl;
+	std::cout << "Ash::initialize() : send initialize to view...   ";
 	view_->initialize(answer, winner, title, subtitle, quizId, orgUser);
+	std::cout << "Done." << std::endl;
 
 	nowMsgOrder_ = 0;
 	for(int i = 0;i < answer;i++){
@@ -76,6 +90,8 @@ void Ash::update(const UserUpdateMessage& msg)
 	auto& user = users_.at(msg.index);
 	if(user.status != User::STATUS::FIGHTER)	// ‘ÎÛŠO
 		return;
+
+	std::cout << "Ash::update() : index = " << msg.index << std::endl;
 
 	auto& prevMsg = prevMsgs_.at(msg.index);
 	// •ÏX‚µ‚Ä‚¢‚­
@@ -98,7 +114,10 @@ void Ash::update(const UserUpdateMessage& msg)
 		modIndex |= 1 << 3;
 	}
 
+	std::cout << "Ash::update() : send UM (" << user.name << ", " << user.correct << ", " << user.wrong << ", " << user.score << ", " << modIndex << ")...   ";
 	view_->sendUserModified(msg.index, user, modIndex);
+	std::cout << "Done." << std::endl;
+
 	prevMsg.user = user;
 
 	// ‡”Ô‚ð“o˜^‚·‚é
@@ -110,7 +129,9 @@ void Ash::update(const UserUpdateMessage& msg)
 		if(id == 1)	user.status = User::STATUS::WINNER;
 		else if(id == 2)	user.status = User::STATUS::LOSER;
 
+		std::cout << "Ash::update() : send AI (" << id << ")...   ";
 		view_->sendInfo(id);
+		std::cout << "Done." << std::endl;
 		prevMsg.info.push_back(id);
 	}
 
@@ -121,8 +142,11 @@ void Ash::update(const UserUpdateMessage& msg)
 			auto& user = users_.at(i);
 			if(user.status != User::STATUS::FIGHTER)	continue;
 			user.status = User::STATUS::LOSER;
+
+			std::cout << "Ash::update() : send LOSE (" << user.name << ", " << user.correct << ", " << user.wrong << ", " << user.score << ", " << modIndex << ")...   ";
 			view_->sendUserModified(i, user, 0);
 			view_->sendInfo(2);
+			std::cout << "Done." << std::endl;
 		}
 	}
 	else if(status == FINISH_STATUS::LOSE_FINISH){
@@ -130,8 +154,11 @@ void Ash::update(const UserUpdateMessage& msg)
 			auto& user = users_.at(i);
 			if(user.status != User::STATUS::FIGHTER)	continue;
 			user.status = User::STATUS::WINNER;
+
+			std::cout << "Ash::update() : send WIN (" << user.name << ", " << user.correct << ", " << user.wrong << ", " << user.score << ", " << modIndex << ")...   ";
 			view_->sendUserModified(i, user, 0);
 			view_->sendInfo(1);
+			std::cout << "Done." << std::endl;
 		}
 	}
 
@@ -139,7 +166,7 @@ void Ash::update(const UserUpdateMessage& msg)
 
 void Ash::save()
 {
-	log_->write("Ash::save()");
+	std::cout << "Ash::save() : making and saving data to saves_" << std::endl;
 
 	// •Û‘¶ˆ—
 	SaveData save;
@@ -190,9 +217,14 @@ void Ash::setSaveData(const SaveData& data)
 		int index = item.first;
 		auto& msg = prevMsgs_.at(index);
 
-		//view_->sendUserModified(index, msg.user, msg.modIndex);
+		std::cout << "Ash::setSaveData() : send UM (" << msg.user.name << ", " << msg.user.correct << ", " << msg.user.wrong << ", " << msg.user.score << ", 0x0f)...   ";
 		view_->sendUserModified(index, msg.user, 0x0f);
-		for(int id : msg.info)	view_->sendInfo(id);
+		std::cout << "Done." << std::endl;
+		for(int id : msg.info){
+			std::cout << "Ash::setSaveData() : send AI (" << id << ")...   ";
+			view_->sendInfo(id);
+			std::cout << "Done." << std::endl;
+		}
 	}
 
 	std::istringstream iss(data.luaVars);

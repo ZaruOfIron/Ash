@@ -35,11 +35,8 @@ void CopyDataView::sendInfo(const std::string& str)
 	sendData(401, str);
 }
 
-#include <iostream>
 void CopyDataView::sendData(int id, const std::string& str)
 {
-	std::cout << id << ": " << str << std::endl;
-
 	// const‰ñ”ð
 	std::shared_ptr<char> data(new char[str.size()], std::default_delete<char[]>());
 	std::memcpy(data.get(), str.c_str(), str.size());
