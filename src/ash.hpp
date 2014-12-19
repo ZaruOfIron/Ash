@@ -38,6 +38,7 @@ private:
 	struct SaveData
 	{
 		std::vector<User> *users;
+		int nowMsgOrder;
 		std::vector<int> *msgOrders;
 		std::vector<PrevMsg> *prevMsgs;
 		std::string luaVars;
@@ -47,7 +48,7 @@ private:
 		template<class Archive>
 			void serialize(Archive& ar, const unsigned int version)
 			{
-				ar & users & msgOrders & prevMsgs & luaVars;
+				ar & users & nowMsgOrder & msgOrders & prevMsgs & luaVars;
 			}
 	};
 
