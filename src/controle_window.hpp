@@ -2,6 +2,7 @@
 #define ___CONTROLE_WINDOW_HPP___
 
 #include <wincore.h>
+#include <stdcontrols.h>
 #include <memory>
 #include <string>
 #include <vector>
@@ -21,9 +22,23 @@ struct ButtonData
 class ControleWindow : public CWnd
 {
 private:
+	class NameEdit : public CEdit
+	{
+	private:
+		ControleWindow& window_;
+		int index_;
+
+	public:
+		NameEdit(ControleWindow& window, int index);
+
+	private:
+		LRESULT WndProc(UINT uMsg, WPARAM wParam, LPARAM lParam);
+	};
+
 	LuaControleScript *controler_;
 	std::vector<ButtonData> userForm_, systemForm_;
 	int answer_;
+	std::vector<std::unique_ptr<NameEdit>> nameEdits_;
 
 	enum {
 		FORM_PART_WIDTH = 100,

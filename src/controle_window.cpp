@@ -1,29 +1,21 @@
 #include "controle_window.hpp"
 #include "lua_controle_script.hpp"
 
-class NameEdit : public CEdit
+ControleWindow::NameEdit::NameEdit(ControleWindow& window, int index)
+	: window_(window), index_(index)
+{}
+
+LRESULT ControleWindow::NameEdit::WndProc(UINT uMsg, WPARAM wParam, LPARAM lParam)
 {
-private:
-	ControleWindow& window_;
-	int index_;
-
-public:
-	NameEdit(ControleWindow& window, int index)
-		: window_(window), index_(index)
-	{}
-
-	LRESULT WndProc(UINT uMsg, WPARAM wParam, LPARAM lParam)
+	switch(uMsg)
 	{
-		switch(uMsg)
-		{
 		case WM_KEYDOWN:
-			if(wParam == VK_TAB)	window_.moveCursor((index_ + 1) % window_.getAnswer());
+			if(wParam == VK_TAB)	window_.moveCursor(index_ % window_.getAnswer() + 1);
 			break;
-		}
-
-		return WndProcDefault(uMsg, wParam, lParam);
 	}
-};
+
+	return WndProcDefault(uMsg, wParam, lParam);
+}
 
 ControleWindow::ControleWindow(LuaControleScript *controler)
 	: controler_(controler), answer_(0)
@@ -61,9 +53,6 @@ LRESULT ControleWindow::WndProc(UINT uMsg, WPARAM wParam, LPARAM lParam)
 	case WM_CREATE:
 		OnCreate();
 		return 0;
-	case WM_NAME_TAB:
-		OnTab();
-		break;
 	case WM_DESTROY:
 		OnDestroy();
 		return 0;
@@ -103,14 +92,15 @@ void ControleWindow::OnCreate()
 
 		int index = i + 1;
 
-		::CreateWindowEx(
+		nameEdits_.push_back(std::unique_ptr<NameEdit>(new NameEdit(*this, index)));
+		nameEdits_.back()->CreateEx(
 			0,
 			"EDIT",
 			"",
 			WS_CHILD | WS_VISIBLE | WS_TABSTOP | WS_BORDER | ES_LEFT,
 			rect.left, rect.top, rect.Width(), FORM_PART_HEIGHT,
-			GetHwnd(), reinterpret_cast<HMENU>(index << 8),
-			::GetModuleHandle(NULL), NULL);
+			GetHwnd(), reinterpret_cast<HMENU>(index << 8), NULL);
+
 
 		for(int j = 0;j < userForm_.size();j++){
 			int x = rect.left, y = rect.top + (j + 1) * (FORM_PART_HEIGHT + 10);
