@@ -125,13 +125,21 @@ void Ash::update(const UserUpdateMessage& msg)
 	for(int id : msg.info){
 		// Ÿ‚¿”²‚¯(1)‚Æ”s‘Ş(2)‚Í‹L˜^‚µ‚Ä‚¨‚­
 		int sendId = id;
-		if(id == 1){
-			user.status = User::STATUS::WINNER;
-			sendId = 100 + ++winnerCount;
-		}
-		else if(id == 2){
-			user.status = User::STATUS::LOSER;
-			sendId = 200 + ++loserCount;
+		if(id < 0){	// id to convert
+			int kind = id * -1 / 10;
+			if(kind == 1){	// win
+				user.status = User::STATUS::WINNER;
+				winnerCount++;
+				sendId = 100;
+				if(id == -11)	sendId += winnerCount;	// with order
+			}
+			else if(kind == 2){	// lose
+				user.status = User::STATUS::LOSER;
+				loserCount++;
+				sendId = 200;
+				if(id == -21)	sendId += loserCount;	// with order
+			}
+			else	assert(false);
 		}
 
 		std::cout << "Ash::update()\t: send AI to " << msg.index << " (" << sendId << ")...   ";

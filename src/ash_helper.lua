@@ -1,7 +1,7 @@
 module('ash_helper', package.seeall)
 
 all_zero_user = { index = 0, correct = 0, wrong = 0, score = 0 }
-has_won_ai, has_lost_ai = 1, 2
+has_won_ai, has_lost_ai = -11, -21
 
 -- ˆø”‚Ì‡”Ô‚Ìindex‚ÅAuser button‚ğì¬‚·‚é
 function create_user_buttons(...)
@@ -52,7 +52,7 @@ end
 
 -- ‡”Ô‚ğl‚¦‚È‚¢Ÿ‚¿”²‚¯‚ğ‘—‚é
 function send_win_without_order(index)
-	ash.set_user(index, {}, {100})
+	ash.set_user(index, {}, {-10})
 end
 
 -- Finish‚Ìˆ—
