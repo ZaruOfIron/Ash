@@ -45,6 +45,9 @@ private:
 		FORM_PART_HEIGHT = 40,
 
 		FORM_PARTS_WIDTH_NUM = 4,
+
+		SAVE_TMP_TIMER_ID = 100,
+		SAVE_TMP_TIMER_INTERVAL = 10 * 1000,
 	};
 	
 public:

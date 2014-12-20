@@ -53,6 +53,13 @@ LRESULT ControleWindow::WndProc(UINT uMsg, WPARAM wParam, LPARAM lParam)
 	case WM_CREATE:
 		OnCreate();
 		return 0;
+	case WM_TIMER:
+		if(wParam == SAVE_TMP_TIMER_ID){
+			controler_->saveTmpFile();
+			KillTimer(SAVE_TMP_TIMER_ID);
+			return 0;
+		}
+		break;
 	case WM_DESTROY:
 		OnDestroy();
 		return 0;
@@ -140,6 +147,9 @@ void ControleWindow::OnCreate()
 	}
 
 	setClientSize(scrWidth, scrHeight);
+
+	// Tmpファイル作成用のタイマを設置
+	SetTimer(SAVE_TMP_TIMER_ID, SAVE_TMP_TIMER_INTERVAL, NULL);
 }
 
 void ControleWindow::OnDestroy()
@@ -151,6 +161,10 @@ BOOL ControleWindow::OnCommand(WPARAM wParam, LPARAM lParam)
 {
 	int num = LOWORD(wParam), id = (num & 0xff), index = (num >> 8);
 	if(index < 0)	return FALSE;
+
+	// Tmpファイル作成用のタイマをリセット
+	KillTimer(SAVE_TMP_TIMER_ID);
+	SetTimer(SAVE_TMP_TIMER_ID, SAVE_TMP_TIMER_INTERVAL, NULL);
 
 	if(id == 0){	// Edit
 		//if(HIWORD(wParam) == EN_UPDATE){
