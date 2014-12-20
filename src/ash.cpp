@@ -12,7 +12,7 @@
 #include <sstream>
 
 Ash::Ash()
-	: users_(), controler_(), view_(new CopyDataView("AUAUA"))
+	: users_(), controler_(), view_(new CopyDataView("UAUA"))
 {
 	log_.reset(new ToolWindow(*this, ID_DIALOG));
 	std::cout << "Ash::Ash()\t: finish construction" << std::endl;
