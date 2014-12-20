@@ -81,6 +81,7 @@ void Ash::setUserNames(const std::vector<std::string>& names)
 
 void Ash::initialize(int answer, int winner, const std::string& title, const std::string& subtitle, int quizId, const User& orgUser)
 {
+	quizId_ = quizId;
 	winner_ = winner;
 	users_.resize(answer, orgUser);
 
@@ -214,6 +215,90 @@ bool Ash::hasFinished() const
 	return getFinishStatus() != FINISH_STATUS::FIGHTING;
 }
 
+void Ash::writeTmpFile(const std::string& filename)
+{
+	// TmpDataを作る
+	TmpData data;
+	data.quizId = quizId_;
+	data.users = &users_;
+	data.saves = &saves_;
+	data.nowMsgOrder = nowMsgOrder_;
+	data.msgOrders = &msgOrders_;
+	data.prevMsgs = &prevMsgs_;
+	makeLuaVarsData(data.luaVars);
+
+	// std::stringにする
+	std::ostringstream oss;
+	boost::archive::text_oarchive oa(oss);
+	oa << data;
+	std::string dataStr = oss.str();
+
+	// ファイルを作る
+	HANDLE hFile = ::CreateFile(
+		filename.c_str(),
+		GENERIC_WRITE,
+		0,
+		NULL,
+		TRUNCATE_EXISTING,
+		FILE_ATTRIBUTE_NORMAL,
+		NULL);
+	if(hFile == INVALID_HANDLE_VALUE)	return;	// Error
+	std::unique_ptr<std::remove_pointer<HANDLE>::type, decltype(&::CloseHandle)> file(hFile, ::CloseHandle);
+
+	// 書き込む
+	DWORD size;
+	::WriteFile(file.get(), dataStr.c_str(), dataStr.size(), &size, NULL);
+}
+
+void Ash::readTmpFile(const std::string& filename)
+{
+	// ファイルを開く
+	HANDLE hFile = ::CreateFile(
+			filename.c_str(),
+			GENERIC_READ,
+			0,
+			NULL,
+			OPEN_EXISTING,
+			FILE_ATTRIBUTE_NORMAL,
+			NULL);
+	assert(hFile != INVALID_HANDLE_VALUE);
+	std::unique_ptr<std::remove_pointer<HANDLE>::type, decltype(&::CloseHandle)> file(hFile, ::CloseHandle);
+
+	// 読み込む
+	DWORD size = ::GetFileSize(file.get(), NULL);
+	assert(size != -1);
+	std::vector<char> buffer(size + 1, '\0');
+	int readSize;
+	::ReadFile(file.get(), buffer.data(), size, &readSize, NULL);
+	buffer.at(size) = '\0';
+
+	// 変換
+	std::istringstream iss(std::string(buffer.begin(), buffer.end()));
+	boost::archive::text_iarchive ia(iss);
+	TmpData data;	ia >> data;
+
+	// セットしていく
+	quizId_ = data.quizId;
+	users_ = *(data.users);	delete data.users;
+	saves_ = *(data.saves);	delete data.saves;
+	nowMsgOrder_ = data.nowMsgOrder;
+	msgOrders_ = *(data.msgOrders);	delete data.msgOrders;
+	prevMsgs_ = *(data.prevMsgs);	delete data.prevMsgs;
+	setLuaVarsData(data.luaVars);
+}
+
+void Ash::makeLuaVarsData(std::string& data)
+{
+	std::ostringstream oss;	controler_->getSaveData(oss);
+	data = oss.str();
+}
+
+void Ash::setLuaVarsData(const std::string& data)
+{
+	std::istringstream iss(data);
+	controler_->restoreSaveData(iss);
+}
+
 void Ash::makeSaveData(SaveData& data)
 {
 	data.users = &users_;
@@ -221,8 +306,7 @@ void Ash::makeSaveData(SaveData& data)
 	data.msgOrders = &msgOrders_;
 	data.prevMsgs = &prevMsgs_;
 
-	std::ostringstream oss;	controler_->getSaveData(oss);
-	data.luaVars = oss.str();
+	makeLuaVarsData(data.luaVars);
 }
 
 void Ash::setSaveData(const SaveData& data)
@@ -256,8 +340,7 @@ void Ash::setSaveData(const SaveData& data)
 		}
 	}
 
-	std::istringstream iss(data.luaVars);
-	controler_->restoreSaveData(iss);
+	setLuaVarsData(data.luaVars);
 }
 
 void Ash::getWLCount(int& winnerCount, int& loserCount) const
