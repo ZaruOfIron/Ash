@@ -18,7 +18,7 @@ end
 
 function initialize()
 	ash_helper.create_user_buttons('CORRECT', 'WRONG')
-	ash_helper.create_system_buttons('FINISH')
+	--ash_helper.create_system_buttons('FINISH')
 
 	-- return info
 	return {
@@ -34,9 +34,11 @@ end
 function on_system_button(id)
 	ash.save()
 
+	--[[
 	if id == 1 then	-- finish
 		ash_helper.finish(ANSWER, WINNER)
 	end
+	]]--
 end
 
 function on_user_button(index, id)
