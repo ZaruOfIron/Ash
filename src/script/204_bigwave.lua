@@ -28,7 +28,7 @@ function initialize()
 	return {
 		answer = ANSWER,
 		winner = WINNER,
-		title = '3rd Round 1st step First set',
+		title = '3rd Round 1st step Final set',
 		subtitle = 'Shangri-La Shower',
 		quizid = 204,
 		org_user = {
