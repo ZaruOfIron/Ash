@@ -24,7 +24,7 @@ Ash::~Ash()
 void Ash::setScript(const std::string& filename)
 {
 	controler_.reset(new LuaControleScript(*this, filename));
-	std::cout << "Ash::setScript()\t: " + filename + "is being loaded" << std::endl;
+	std::cout << "Ash::setScript()\t: " + filename + " is being loaded" << std::endl;
 	controler_->initialize();
 	std::cout << "Ash::setScript()\t: complete loading" << std::endl;
 }
