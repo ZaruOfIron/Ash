@@ -265,7 +265,10 @@ void Ash::writeTmpFile(const std::string& filename)
 		createFlag,
 		FILE_ATTRIBUTE_NORMAL,
 		NULL);
-	if(hFile == INVALID_HANDLE_VALUE)	return;	// Error
+	if(hFile == INVALID_HANDLE_VALUE){
+		std::cout << "Ash::writeTmpFile()\t: Can't create file" << std::endl;
+		return;
+	}
 	std::unique_ptr<std::remove_pointer<HANDLE>::type, decltype(&::CloseHandle)> file(hFile, ::CloseHandle);
 
 	// èëÇ´çûÇﬁ
