@@ -39,7 +39,7 @@ function on_system_button(id)
 		local users = ash_helper.get_all_users(ANSWER)
 		ash_helper.sort_users(users)
 		for i = 1, WINNER do
-			ash_helper.send_win_without_order(i)
+			ash_helper.send_win_without_order(users[i].index)
 		end
 	end
 end

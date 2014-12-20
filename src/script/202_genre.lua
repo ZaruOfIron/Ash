@@ -36,12 +36,15 @@ function on_system_button(id)
 		-- socre => correct => index
 		table.sort(users,
 			function(a, b)
+				print(string.format('%d, %d', a.score, b.score))
+				print(string.format('  %d', a.score > b.score and 1 or 0))
 				if a.score ~= b.score then return a.score > b.score end
+				print('DEBUG')
 				if a.correct ~= b.correct then return a.correct > b.correct end
 				return a.index < b.index
 			end)
 		for i = 1, WINNER do
-			ash_helper.send_win_without_order(i)
+			ash_helper.send_win_without_order(users[i].index)
 		end
 	end
 end

@@ -64,7 +64,7 @@ function on_system_button(id)
 				return a.index < b.index
 			end)
 		for i = 1, WINNER do
-			ash_helper.send_win_without_order(i)
+			ash_helper.send_win_without_order(users[i].index)
 		end
 	end
 end
