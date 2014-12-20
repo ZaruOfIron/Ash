@@ -5,6 +5,7 @@
 #include "resource.h"
 #include <boost/archive/text_oarchive.hpp>
 #include <boost/archive/text_iarchive.hpp>
+#include <algorithm>
 #include <iostream>
 #include <list>
 #include <utility>
@@ -61,6 +62,21 @@ void Ash::undo()
 	std::istringstream iss(saves_.back());	saves_.pop_back();
 	readSaveData(iss);
 	std::cout << "Ash::undo()\t: complete undo." << std::endl;
+}
+
+void Ash::setUserNames(const std::vector<std::string>& names)
+{
+	std::cout << "Ash::setUserNames()\t: setting user names" << std::endl;
+	int size = std::min(users_.size(), names.size());
+
+	for(int i = 0;i < size;i++){
+		auto& user = users_.at(i);
+		user.name = names.at(i);
+		std::cout << "Ash::setUserNames()\t: send UM to " << i << " (" << user.name << ", " << user.correct << ", " << user.wrong << ", " << user.score << ", 1)...   ";
+		view_->sendUserModified(i, user, 1);
+		std::cout << "done." << std::endl;
+	}
+	std::cout << "Ash::setUserNames()\t: setting complete" << std::endl;
 }
 
 void Ash::initialize(int answer, int winner, const std::string& title, const std::string& subtitle, int quizId, const User& orgUser)

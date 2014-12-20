@@ -67,6 +67,9 @@ BOOL ToolWindow::OnCommand(WPARAM wParam, LPARAM lParam)
 	case ID_RESTOREDATA:
 		OnRestoreData();
 		return TRUE;
+	case ID_SETNAMES:
+		OnSetNames();
+		return TRUE;
 	}
 
 	return FALSE;
@@ -88,5 +91,19 @@ void ToolWindow::OnRestoreData()
 
 	std::ifstream ifs(file);
 	ash_.readSaveData(ifs);
+}
+
+void ToolWindow::OnSetNames()
+{
+	std::string file = askFileOpen("txt", "txt(*.txt)\0*.txt\0All files(*.*)\0*.*\0\0", "Open name data");
+	if(file.empty())	return;
+
+	std::ifstream ifs(file);
+	std::vector<std::string> names;
+	std::string inp;
+	while(std::getline(ifs, inp)){
+		names.push_back(inp);
+	}
+	ash_.setUserNames(names);
 }
 

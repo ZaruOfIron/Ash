@@ -74,6 +74,7 @@ public:
 	void writeSaveData(std::ostream& os);
 	void readSaveData(std::istream& is);
 	void undo();
+	void setUserNames(const std::vector<std::string>& names);
 
 	// Call from controle script
 	void initialize(int answer, int winner, const std::string& title, const std::string& subtitle, int quizId, const User& orgUser);

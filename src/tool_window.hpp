@@ -25,6 +25,7 @@ private:
 	BOOL OnCommand(WPARAM wParam, LPARAM lParam);
 	void OnSaveData();
 	void OnRestoreData();
+	void OnSetNames();
 };
 
 #endif
