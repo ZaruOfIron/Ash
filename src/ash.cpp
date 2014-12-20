@@ -118,21 +118,38 @@ void Ash::update(const UserUpdateMessage& msg)
 	// ‡”Ô‚ğ“o˜^‚·‚é
 	msgOrders_.at(msg.index) = nowMsgOrder_++;
 
+	int winnerCount, loserCount;
+	getWLCount(winnerCount, loserCount);
+
 	prevMsg.info.clear();
 	for(int id : msg.info){
 		// Ÿ‚¿”²‚¯(1)‚Æ”s‘Ş(2)‚Í‹L˜^‚µ‚Ä‚¨‚­
-		if(id == 1)	user.status = User::STATUS::WINNER;
-		else if(id == 2)	user.status = User::STATUS::LOSER;
+		int sendId = id;
+		if(id < 0){	// id to convert
+			int kind = id * -1 / 10;
+			if(kind == 1){	// win
+				user.status = User::STATUS::WINNER;
+				winnerCount++;
+				sendId = 100;
+				if(id == -11)	sendId += winnerCount;	// with order
+			}
+			else if(kind == 2){	// lose
+				user.status = User::STATUS::LOSER;
+				loserCount++;
+				sendId = 200;
+				if(id == -21)	sendId += loserCount;	// with order
+			}
+			else	assert(false);
+		}
 
-		std::cout << "Ash::update()\t: send AI to " << msg.index << " (" << id << ")...   ";
-		view_->sendInfo(id);
+		std::cout << "Ash::update()\t: send AI to " << msg.index << " (" << sendId << ")...   ";
+		view_->sendInfo(sendId);
 		std::cout << "done." << std::endl;
-		prevMsg.info.push_back(id);
+		prevMsg.info.push_back(sendId);
 	}
 
 	// I‚í‚ê‚ÎAI—¹ˆ—‚ğs‚¤
-	FINISH_STATUS status = getFinishStatus();
-	if(status == FINISH_STATUS::WIN_FINISH){
+	if(winnerCount >= winner_){
 		std::cout << "Ash::update()\t: WIN_FINISH" << std::endl;
 		for(int i = 0;i < users_.size();i++){
 			auto& user = users_.at(i);
@@ -141,11 +158,11 @@ void Ash::update(const UserUpdateMessage& msg)
 
 			std::cout << "Ash::update()\t: send LOSE to " << i << " (" << user.name << ", " << user.correct << ", " << user.wrong << ", " << user.score << ", " << modIndex << ")...   ";
 			view_->sendUserModified(i, user, 0);
-			view_->sendInfo(2);
+			view_->sendInfo(200);
 			std::cout << "done." << std::endl;
 		}
 	}
-	else if(status == FINISH_STATUS::LOSE_FINISH){
+	else if(loserCount >= users_.size() - winner_){
 		std::cout << "Ash::update()\t: LOSE_FINISH" << std::endl;
 		for(int i = 0;i < users_.size();i++){
 			auto& user = users_.at(i);
@@ -154,7 +171,7 @@ void Ash::update(const UserUpdateMessage& msg)
 
 			std::cout << "Ash::update()\t: send WIN to " << i << " (" << user.name << ", " << user.correct << ", " << user.wrong << ", " << user.score << ", " << modIndex << ")...   ";
 			view_->sendUserModified(i, user, 0);
-			view_->sendInfo(1);
+			view_->sendInfo(100);
 			std::cout << "done." << std::endl;
 		}
 	}
@@ -227,13 +244,20 @@ void Ash::setSaveData(const SaveData& data)
 	controler_->restoreSaveData(iss);
 }
 
+void Ash::getWLCount(int& winnerCount, int& loserCount) const
+{
+	winnerCount = loserCount = 0;
+
+	for(const auto& user : users_){
+		if(user.status == User::STATUS::WINNER)	winnerCount++;
+		else if(user.status == User::STATUS::LOSER)	loserCount++;
+	}
+}
+
 Ash::FINISH_STATUS Ash::getFinishStatus() const
 {
 	int numWinner = 0, numLoser = 0;
-	for(auto& user : users_){
-		if(user.status == User::STATUS::WINNER)	numWinner++;
-		else if(user.status == User::STATUS::LOSER)	numLoser++;
-	}
+	getWLCount(numWinner, numLoser);
 
 	if(numWinner >= winner_)	return FINISH_STATUS::WIN_FINISH;
 	else if(numLoser >= users_.size() - winner_)	return FINISH_STATUS::LOSE_FINISH;

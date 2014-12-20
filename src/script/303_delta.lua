@@ -48,14 +48,14 @@ function on_user_button(index, id)
 		end
 
 		if data.score >= SCORE_LIMIT then	-- clear
-			table.insert(info, 1)
+			table.insert(info, ash_helper.has_won_ai)
 		end
 	elseif id == 2 then	-- wrong
 		data.wrong = user.wrong + 1
 
 		local target = ash.get_user((index + dir_count) % ANSWER + 1)
 		if target.score + 1 >= SCORE_LIMIT then -- clear
-			ash.set_user(target.index, { score = target.score + 1 }, {1})
+			ash.set_user(target.index, { score = target.score + 1 }, {ash_helper.has_won_ai, 30303})
 		else
 			ash.set_user(target.index, { score = target.score + 1 })
 		end
