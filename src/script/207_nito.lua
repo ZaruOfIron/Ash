@@ -25,7 +25,7 @@ function initialize()
 	return {
 		answer = ANSWER,
 		winner = WINNER,
-		title = '3rd Round 3rd step Quarter final',
+		title = '3rd Round Final step Quarter final',
 		subtitle = 'ÉRÅ[ÉXÉ¿ Ç…Ç¡Ç±Ç…Ç¡Ç±Ç…Å`ÅÙ',
 		quizid = 207,
 		org_user = ash_helper.all_zero_user
