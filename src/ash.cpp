@@ -88,7 +88,6 @@ void Ash::initialize(int answer, int winner, const std::string& title, const std
 {
 	quizId_ = quizId;
 	winner_ = winner;
-	users_.resize(answer, orgUser);
 
 	std::cout << "Ash::initialize()\t: send INIT" << std::endl
 		<< "\t("  << answer << ", " << winner << ", " << title << ", " << subtitle << ", " << quizId << ", (" << orgUser.correct << ", " << orgUser.wrong << ", " << orgUser.score << "))" << std::endl
@@ -96,11 +95,37 @@ void Ash::initialize(int answer, int winner, const std::string& title, const std
 	view_->initialize(answer, winner, title, subtitle, quizId, orgUser);
 	std::cout << "done." << std::endl;
 
-	nowMsgOrder_ = 0;
-	for(int i = 0;i < answer;i++){
-		//view_->sendUserModified(i, orgUser, 0x0f);
-		prevMsgs_.push_back(PrevMsg(orgUser, 0x0f));
-		msgOrders_.push_back(nowMsgOrder_++);
+	if(tmpData_){	// in restoring tmp file
+		auto& data = *tmpData_;
+		assert(data.quizId == quizId);
+
+		std::cout << "Ash::initialize()\t: restoring tmp file" << std::endl;
+
+		// セットしていく
+		users_ = *(data.users);	delete data.users;
+		saves_ = *(data.saves);	delete data.saves;
+		nowMsgOrder_ = data.nowMsgOrder;
+		msgOrders_ = *(data.msgOrders);	delete data.msgOrders;
+		prevMsgs_ = *(data.prevMsgs);	delete data.prevMsgs;
+		setLuaVarsData(data.luaVars);
+
+		std::cout << "Ash::initialize()\t: waiting in several seconds...   ";
+		::Sleep(1500);
+		std::cout << "done." << std::endl;
+		std::cout << "Ash::initialize()\t: start to send all prev msgs" << std::endl;
+		sendAllPrevMsgs();
+		std::cout << "Ash::initialize()\t: complete sending" << std::endl;
+
+		tmpData_ = boost::none;
+	}
+	else{
+		users_.resize(answer, orgUser);
+		nowMsgOrder_ = 0;
+
+		for(int i = 0;i < answer;i++){
+			prevMsgs_.push_back(PrevMsg(orgUser, 0x0f));
+			msgOrders_.push_back(nowMsgOrder_++);
+		}
 	}
 }
 
@@ -294,6 +319,13 @@ void Ash::setSaveData(const SaveData& data)
 
 	prevMsgs_ = *(data.prevMsgs);
 	delete data.prevMsgs;	// newed by boost::serialization
+	sendAllPrevMsgs();
+
+	setLuaVarsData(data.luaVars);
+}
+
+void Ash::sendAllPrevMsgs()
+{
 	// メッセージを送る順番を算出する
 	std::list<std::pair<int, int>> order;
 	for(int i = 0;i < msgOrders_.size();i++)	order.push_back(std::make_pair(i, msgOrders_.at(i)));
@@ -303,17 +335,15 @@ void Ash::setSaveData(const SaveData& data)
 		int index = item.first;
 		auto& msg = prevMsgs_.at(index);
 
-		std::cout << "Ash::setSaveData()\t: send UM to " << index << " (" << msg.user.name << ", " << msg.user.correct << ", " << msg.user.wrong << ", " << msg.user.score << ", 0x0f)...   ";
+		std::cout << "Ash::sendAllPrevMsgs()\t: send UM to " << index << " (" << msg.user.name << ", " << msg.user.correct << ", " << msg.user.wrong << ", " << msg.user.score << ", 0x0f)...   ";
 		view_->sendUserModified(index, msg.user, 0x0f);
 		std::cout << "done." << std::endl;
 		for(int id : msg.info){
-			std::cout << "Ash::setSaveData()\t: send AI to " << index << "(" << id << ")...   ";
+			std::cout << "Ash::sendAllPrevMsgs()\t: send AI to " << index << "(" << id << ")...   ";
 			view_->sendInfo(id);
 			std::cout << "done." << std::endl;
 		}
 	}
-
-	setLuaVarsData(data.luaVars);
 }
 
 void Ash::readTmpFile(const std::string& filename)
@@ -344,15 +374,7 @@ void Ash::readTmpFile(const std::string& filename)
 	std::istringstream iss(std::string(buffer.begin(), buffer.end()));
 	boost::archive::text_iarchive ia(iss);
 	TmpData data;	ia >> data;
-
-	// セットしていく
-	quizId_ = data.quizId;
-	users_ = *(data.users);	delete data.users;
-	saves_ = *(data.saves);	delete data.saves;
-	nowMsgOrder_ = data.nowMsgOrder;
-	msgOrders_ = *(data.msgOrders);	delete data.msgOrders;
-	prevMsgs_ = *(data.prevMsgs);	delete data.prevMsgs;
-	setLuaVarsData(data.luaVars);
+	tmpData_ = data;
 
 	std::cout << "Ash::readTmpFile()\t: complete" << std::endl;
 }

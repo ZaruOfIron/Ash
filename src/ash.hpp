@@ -112,6 +112,7 @@ private:
 	void setLuaVarsData(const std::string& data);
 	void makeSaveData(SaveData& data);
 	void setSaveData(const SaveData& data);
+	void sendAllPrevMsgs();
 
 	void readTmpFile(const std::string& filename);
 
