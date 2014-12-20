@@ -1,5 +1,6 @@
 #include "controle_window.hpp"
 #include "lua_controle_script.hpp"
+#include "resource.h"
 
 ControleWindow::NameEdit::NameEdit(ControleWindow& window, int index)
 	: window_(window), index_(index)
@@ -78,6 +79,10 @@ void ControleWindow::PreCreate(CREATESTRUCT& cs)
 
 void ControleWindow::OnCreate()
 {
+	// IconÇéwíË
+	SetIconLarge(ID_ICON);
+	SetIconSmall(ID_ICON);
+
 	int scrWidth = 0, scrHeight = 0;
 	// User FormÇê›íu
 	for(int i = 0;i < answer_;i++){

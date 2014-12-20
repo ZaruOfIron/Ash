@@ -24,3 +24,11 @@ FONT 12, "MS UI Gothic"
     PUSHBUTTON      "Save Data", ID_SAVEDATA, 85, 10, 50, 30, 0, WS_EX_LEFT
     PUSHBUTTON      "Restore Data", ID_RESTOREDATA, 155, 10, 50, 30, 0, WS_EX_LEFT
 }
+
+
+
+//
+// Icon resources
+//
+LANGUAGE LANG_NEUTRAL, SUBLANG_NEUTRAL
+ID_ICON            ICON           ".\\icon.ico"
