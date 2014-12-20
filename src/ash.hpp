@@ -2,6 +2,7 @@
 #define ___ASH_HPP___
 
 #include "user.hpp"
+#include <boost/optional.hpp>
 #include <boost/serialization/vector.hpp>
 #include <memory>
 #include <vector>
@@ -52,41 +53,68 @@ private:
 			}
 	};
 
+	struct TmpData
+	{
+		int quizId;
+		std::vector<User> *users;
+		std::vector<std::string> *saves;
+		int nowMsgOrder;
+		std::vector<int> *msgOrders;
+		std::vector<PrevMsg> *prevMsgs;
+		std::string luaVars;
+
+	private:
+		friend class boost::serialization::access;
+		template<class Archive>
+			void serialize(Archive& ar, const unsigned int version)
+			{
+				ar & quizId & users & saves & nowMsgOrder & msgOrders & prevMsgs & luaVars;
+			}
+	};
+
 	std::vector<User> users_;
 	std::unique_ptr<ControleScript> controler_;
 	std::unique_ptr<View> view_;
 	std::unique_ptr<ToolWindow> log_;
-	int winner_;
+	int quizId_, winner_;
 	std::vector<std::string> saves_;
 	int nowMsgOrder_;
 	std::vector<int> msgOrders_;
 	std::vector<PrevMsg> prevMsgs_;
+	boost::optional<TmpData> tmpData_;
 
 public:
 	Ash();
 	~Ash();
 
-	// Call from main()
+	// call from main
+	void setTmpFile(const std::string& filename);
 	void setScript(const std::string& filename);
 	void run();
 
-	// Call from log window
+	// call from tool window
 	void writeSaveData(std::ostream& os);
 	void readSaveData(std::istream& is);
 	void undo();
 	void setUserNames(const std::vector<std::string>& names);
 
-	// Call from controle script
+	// call from lua controle script
 	void initialize(int answer, int winner, const std::string& title, const std::string& subtitle, int quizId, const User& orgUser);
 	void update(const UserUpdateMessage& msg);
 	void save();
+	void writeTmpFile(const std::string& filename);
 
 	const User& getUser(int index) const;
 	bool hasFinished() const;
 
 private:
+	void makeLuaVarsData(std::string& data);
+	void setLuaVarsData(const std::string& data);
 	void makeSaveData(SaveData& data);
 	void setSaveData(const SaveData& data);
+	void sendAllPrevMsgs();
+
+	void readTmpFile(const std::string& filename);
 
 	void getWLCount(int& winnerCount, int& loserCount) const;
 	// クイズの終了確認を行う

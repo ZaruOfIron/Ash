@@ -21,6 +21,11 @@ Ash::Ash()
 Ash::~Ash()
 {}
 
+void Ash::setTmpFile(const std::string& filename)
+{
+	readTmpFile(filename);
+}
+
 void Ash::setScript(const std::string& filename)
 {
 	controler_.reset(new LuaControleScript(*this, filename));
@@ -81,8 +86,8 @@ void Ash::setUserNames(const std::vector<std::string>& names)
 
 void Ash::initialize(int answer, int winner, const std::string& title, const std::string& subtitle, int quizId, const User& orgUser)
 {
+	quizId_ = quizId;
 	winner_ = winner;
-	users_.resize(answer, orgUser);
 
 	std::cout << "Ash::initialize()\t: send INIT" << std::endl
 		<< "\t("  << answer << ", " << winner << ", " << title << ", " << subtitle << ", " << quizId << ", (" << orgUser.correct << ", " << orgUser.wrong << ", " << orgUser.score << "))" << std::endl
@@ -90,11 +95,37 @@ void Ash::initialize(int answer, int winner, const std::string& title, const std
 	view_->initialize(answer, winner, title, subtitle, quizId, orgUser);
 	std::cout << "done." << std::endl;
 
-	nowMsgOrder_ = 0;
-	for(int i = 0;i < answer;i++){
-		//view_->sendUserModified(i, orgUser, 0x0f);
-		prevMsgs_.push_back(PrevMsg(orgUser, 0x0f));
-		msgOrders_.push_back(nowMsgOrder_++);
+	if(tmpData_){	// in restoring tmp file
+		auto& data = *tmpData_;
+		assert(data.quizId == quizId);
+
+		std::cout << "Ash::initialize()\t: restoring tmp file" << std::endl;
+
+		// セットしていく
+		users_ = *(data.users);	delete data.users;
+		saves_ = *(data.saves);	delete data.saves;
+		nowMsgOrder_ = data.nowMsgOrder;
+		msgOrders_ = *(data.msgOrders);	delete data.msgOrders;
+		prevMsgs_ = *(data.prevMsgs);	delete data.prevMsgs;
+		setLuaVarsData(data.luaVars);
+
+		std::cout << "Ash::initialize()\t: waiting in several seconds...   ";
+		::Sleep(1500);
+		std::cout << "done." << std::endl;
+		std::cout << "Ash::initialize()\t: start to send all prev msgs" << std::endl;
+		sendAllPrevMsgs();
+		std::cout << "Ash::initialize()\t: complete sending" << std::endl;
+
+		tmpData_ = boost::none;
+	}
+	else{
+		users_.resize(answer, orgUser);
+		nowMsgOrder_ = 0;
+
+		for(int i = 0;i < answer;i++){
+			prevMsgs_.push_back(PrevMsg(orgUser, 0x0f));
+			msgOrders_.push_back(nowMsgOrder_++);
+		}
 	}
 }
 
@@ -204,6 +235,49 @@ void Ash::save()
 	std::cout << "Ash::save()\t: complete save" << std::endl;
 }
 
+void Ash::writeTmpFile(const std::string& filename)
+{
+	std::cout << "Ash::writeTmpFile()\t: writing tmp file" << std::endl;
+
+	// TmpDataを作る
+	TmpData data;
+	data.quizId = quizId_;
+	data.users = &users_;
+	data.saves = &saves_;
+	data.nowMsgOrder = nowMsgOrder_;
+	data.msgOrders = &msgOrders_;
+	data.prevMsgs = &prevMsgs_;
+	makeLuaVarsData(data.luaVars);
+
+	// std::stringにする
+	std::ostringstream oss;
+	boost::archive::text_oarchive oa(oss);
+	oa << data;
+	std::string dataStr = oss.str();
+
+	// ファイルを作る
+	DWORD createFlag = ::PathFileExists(filename.c_str()) ? TRUNCATE_EXISTING : CREATE_NEW;
+	HANDLE hFile = ::CreateFile(
+		filename.c_str(),
+		GENERIC_WRITE,
+		0,
+		NULL,
+		createFlag,
+		FILE_ATTRIBUTE_NORMAL,
+		NULL);
+	if(hFile == INVALID_HANDLE_VALUE){
+		std::cout << "Ash::writeTmpFile()\t: Can't create file" << std::endl;
+		return;
+	}
+	std::unique_ptr<std::remove_pointer<HANDLE>::type, decltype(&::CloseHandle)> file(hFile, ::CloseHandle);
+
+	// 書き込む
+	DWORD size;
+	::WriteFile(file.get(), dataStr.c_str(), dataStr.size(), &size, NULL);
+
+	std::cout << "Ash::writeTmpFile()\t: complete" << std::endl;
+}
+
 const User& Ash::getUser(int index) const
 {
 	return users_.at(index);
@@ -214,6 +288,18 @@ bool Ash::hasFinished() const
 	return getFinishStatus() != FINISH_STATUS::FIGHTING;
 }
 
+void Ash::makeLuaVarsData(std::string& data)
+{
+	std::ostringstream oss;	controler_->getSaveData(oss);
+	data = oss.str();
+}
+
+void Ash::setLuaVarsData(const std::string& data)
+{
+	std::istringstream iss(data);
+	controler_->restoreSaveData(iss);
+}
+
 void Ash::makeSaveData(SaveData& data)
 {
 	data.users = &users_;
@@ -221,8 +307,7 @@ void Ash::makeSaveData(SaveData& data)
 	data.msgOrders = &msgOrders_;
 	data.prevMsgs = &prevMsgs_;
 
-	std::ostringstream oss;	controler_->getSaveData(oss);
-	data.luaVars = oss.str();
+	makeLuaVarsData(data.luaVars);
 }
 
 void Ash::setSaveData(const SaveData& data)
@@ -237,6 +322,13 @@ void Ash::setSaveData(const SaveData& data)
 
 	prevMsgs_ = *(data.prevMsgs);
 	delete data.prevMsgs;	// newed by boost::serialization
+	sendAllPrevMsgs();
+
+	setLuaVarsData(data.luaVars);
+}
+
+void Ash::sendAllPrevMsgs()
+{
 	// メッセージを送る順番を算出する
 	std::list<std::pair<int, int>> order;
 	for(int i = 0;i < msgOrders_.size();i++)	order.push_back(std::make_pair(i, msgOrders_.at(i)));
@@ -246,18 +338,48 @@ void Ash::setSaveData(const SaveData& data)
 		int index = item.first;
 		auto& msg = prevMsgs_.at(index);
 
-		std::cout << "Ash::setSaveData()\t: send UM to " << index << " (" << msg.user.name << ", " << msg.user.correct << ", " << msg.user.wrong << ", " << msg.user.score << ", 0x0f)...   ";
+		std::cout << "Ash::sendAllPrevMsgs()\t: send UM to " << index << " (" << msg.user.name << ", " << msg.user.correct << ", " << msg.user.wrong << ", " << msg.user.score << ", 0x0f)...   ";
 		view_->sendUserModified(index, msg.user, 0x0f);
 		std::cout << "done." << std::endl;
 		for(int id : msg.info){
-			std::cout << "Ash::setSaveData()\t: send AI to " << index << "(" << id << ")...   ";
+			std::cout << "Ash::sendAllPrevMsgs()\t: send AI to " << index << "(" << id << ")...   ";
 			view_->sendInfo(id);
 			std::cout << "done." << std::endl;
 		}
 	}
+}
 
-	std::istringstream iss(data.luaVars);
-	controler_->restoreSaveData(iss);
+void Ash::readTmpFile(const std::string& filename)
+{
+	std::cout << "Ash::readTmpFile()\t: reading tmp file" << std::endl;
+
+	// ファイルを開く
+	HANDLE hFile = ::CreateFile(
+			filename.c_str(),
+			GENERIC_READ,
+			0,
+			NULL,
+			OPEN_EXISTING,
+			FILE_ATTRIBUTE_NORMAL,
+			NULL);
+	assert(hFile != INVALID_HANDLE_VALUE);
+	std::unique_ptr<std::remove_pointer<HANDLE>::type, decltype(&::CloseHandle)> file(hFile, ::CloseHandle);
+
+	// 読み込む
+	DWORD size = ::GetFileSize(file.get(), NULL);
+	assert(size != -1);
+	std::vector<char> buffer(size + 1, '\0');
+	DWORD readSize;
+	::ReadFile(file.get(), buffer.data(), size, &readSize, NULL);
+	buffer.at(size) = '\0';
+
+	// 変換
+	std::istringstream iss(std::string(buffer.begin(), buffer.end()));
+	boost::archive::text_iarchive ia(iss);
+	TmpData data;	ia >> data;
+	tmpData_ = data;
+
+	std::cout << "Ash::readTmpFile()\t: complete" << std::endl;
 }
 
 void Ash::getWLCount(int& winnerCount, int& loserCount) const

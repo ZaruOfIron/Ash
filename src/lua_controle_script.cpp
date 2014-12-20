@@ -173,6 +173,11 @@ void LuaControleScript::onName(int index, const std::string& name)
 	thisPtr_->ash_.update(msg);
 }
 
+void LuaControleScript::saveTmpFile()
+{
+	ash_.writeTmpFile("./ashtmp");
+}
+
 bool LuaControleScript::checkboolean(lua_State *L, int index)
 {
 	assert(lua_isboolean(L, index));

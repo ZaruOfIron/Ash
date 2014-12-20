@@ -32,6 +32,7 @@ public:
 	void onUserButton(int index, int id);
 	void onSystemButton(int id);
 	void onName(int index, const std::string& name);
+	void saveTmpFile();
 
 private:
 	static bool checkboolean(lua_State *L, int index);
