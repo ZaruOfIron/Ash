@@ -2,6 +2,7 @@
 #define ___ASH_HPP___
 
 #include "user.hpp"
+#include <boost/optional.hpp>
 #include <boost/serialization/vector.hpp>
 #include <memory>
 #include <vector>
@@ -80,34 +81,39 @@ private:
 	int nowMsgOrder_;
 	std::vector<int> msgOrders_;
 	std::vector<PrevMsg> prevMsgs_;
+	boost::optional<TmpData> tmpData_;
 
 public:
 	Ash();
 	~Ash();
 
+	// call from main
+	void setTmpFile(const std::string& filename);
 	void setScript(const std::string& filename);
 	void run();
 
+	// call from tool window
 	void writeSaveData(std::ostream& os);
 	void readSaveData(std::istream& is);
 	void undo();
 	void setUserNames(const std::vector<std::string>& names);
 
+	// call from lua controle script
 	void initialize(int answer, int winner, const std::string& title, const std::string& subtitle, int quizId, const User& orgUser);
 	void update(const UserUpdateMessage& msg);
 	void save();
+	void writeTmpFile(const std::string& filename);
 
 	const User& getUser(int index) const;
 	bool hasFinished() const;
-
-	void writeTmpFile(const std::string& filename);
-	void readTmpFile(const std::string& filename);
 
 private:
 	void makeLuaVarsData(std::string& data);
 	void setLuaVarsData(const std::string& data);
 	void makeSaveData(SaveData& data);
 	void setSaveData(const SaveData& data);
+
+	void readTmpFile(const std::string& filename);
 
 	void getWLCount(int& winnerCount, int& loserCount) const;
 	// クイズの終了確認を行う

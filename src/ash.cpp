@@ -21,6 +21,11 @@ Ash::Ash()
 Ash::~Ash()
 {}
 
+void Ash::setTmpFile(const std::string& filename)
+{
+	readTmpFile(filename);
+}
+
 void Ash::setScript(const std::string& filename)
 {
 	controler_.reset(new LuaControleScript(*this, filename));
@@ -205,16 +210,6 @@ void Ash::save()
 	std::cout << "Ash::save()\t: complete save" << std::endl;
 }
 
-const User& Ash::getUser(int index) const
-{
-	return users_.at(index);
-}
-
-bool Ash::hasFinished() const
-{
-	return getFinishStatus() != FINISH_STATUS::FIGHTING;
-}
-
 void Ash::writeTmpFile(const std::string& filename)
 {
 	// TmpDataを作る
@@ -250,41 +245,14 @@ void Ash::writeTmpFile(const std::string& filename)
 	::WriteFile(file.get(), dataStr.c_str(), dataStr.size(), &size, NULL);
 }
 
-void Ash::readTmpFile(const std::string& filename)
+const User& Ash::getUser(int index) const
 {
-	// ファイルを開く
-	HANDLE hFile = ::CreateFile(
-			filename.c_str(),
-			GENERIC_READ,
-			0,
-			NULL,
-			OPEN_EXISTING,
-			FILE_ATTRIBUTE_NORMAL,
-			NULL);
-	assert(hFile != INVALID_HANDLE_VALUE);
-	std::unique_ptr<std::remove_pointer<HANDLE>::type, decltype(&::CloseHandle)> file(hFile, ::CloseHandle);
+	return users_.at(index);
+}
 
-	// 読み込む
-	DWORD size = ::GetFileSize(file.get(), NULL);
-	assert(size != -1);
-	std::vector<char> buffer(size + 1, '\0');
-	int readSize;
-	::ReadFile(file.get(), buffer.data(), size, &readSize, NULL);
-	buffer.at(size) = '\0';
-
-	// 変換
-	std::istringstream iss(std::string(buffer.begin(), buffer.end()));
-	boost::archive::text_iarchive ia(iss);
-	TmpData data;	ia >> data;
-
-	// セットしていく
-	quizId_ = data.quizId;
-	users_ = *(data.users);	delete data.users;
-	saves_ = *(data.saves);	delete data.saves;
-	nowMsgOrder_ = data.nowMsgOrder;
-	msgOrders_ = *(data.msgOrders);	delete data.msgOrders;
-	prevMsgs_ = *(data.prevMsgs);	delete data.prevMsgs;
-	setLuaVarsData(data.luaVars);
+bool Ash::hasFinished() const
+{
+	return getFinishStatus() != FINISH_STATUS::FIGHTING;
 }
 
 void Ash::makeLuaVarsData(std::string& data)
@@ -340,6 +308,43 @@ void Ash::setSaveData(const SaveData& data)
 		}
 	}
 
+	setLuaVarsData(data.luaVars);
+}
+
+void Ash::readTmpFile(const std::string& filename)
+{
+	// ファイルを開く
+	HANDLE hFile = ::CreateFile(
+			filename.c_str(),
+			GENERIC_READ,
+			0,
+			NULL,
+			OPEN_EXISTING,
+			FILE_ATTRIBUTE_NORMAL,
+			NULL);
+	assert(hFile != INVALID_HANDLE_VALUE);
+	std::unique_ptr<std::remove_pointer<HANDLE>::type, decltype(&::CloseHandle)> file(hFile, ::CloseHandle);
+
+	// 読み込む
+	DWORD size = ::GetFileSize(file.get(), NULL);
+	assert(size != -1);
+	std::vector<char> buffer(size + 1, '\0');
+	int readSize;
+	::ReadFile(file.get(), buffer.data(), size, &readSize, NULL);
+	buffer.at(size) = '\0';
+
+	// 変換
+	std::istringstream iss(std::string(buffer.begin(), buffer.end()));
+	boost::archive::text_iarchive ia(iss);
+	TmpData data;	ia >> data;
+
+	// セットしていく
+	quizId_ = data.quizId;
+	users_ = *(data.users);	delete data.users;
+	saves_ = *(data.saves);	delete data.saves;
+	nowMsgOrder_ = data.nowMsgOrder;
+	msgOrders_ = *(data.msgOrders);	delete data.msgOrders;
+	prevMsgs_ = *(data.prevMsgs);	delete data.prevMsgs;
 	setLuaVarsData(data.luaVars);
 }
 
