@@ -49,6 +49,7 @@ function on_user_button(index, id)
 
 		if data.score >= SCORE_LIMIT then	-- clear
 			table.insert(info, ash_helper.has_won_ai)
+			table.insert(info, 30303)
 		end
 	elseif id == 2 then	-- wrong
 		data.wrong = user.wrong + 1
