@@ -212,6 +212,8 @@ void Ash::save()
 
 void Ash::writeTmpFile(const std::string& filename)
 {
+	std::cout << "Ash::writeTmpFile()\t: writing tmp file" << std::endl;
+
 	// TmpDataを作る
 	TmpData data;
 	data.quizId = quizId_;
@@ -229,12 +231,13 @@ void Ash::writeTmpFile(const std::string& filename)
 	std::string dataStr = oss.str();
 
 	// ファイルを作る
+	DWORD createFlag = ::PathFileExists(filename.c_str()) ? TRUNCATE_EXISTING : CREATE_NEW;
 	HANDLE hFile = ::CreateFile(
 		filename.c_str(),
 		GENERIC_WRITE,
 		0,
 		NULL,
-		TRUNCATE_EXISTING,
+		createFlag,
 		FILE_ATTRIBUTE_NORMAL,
 		NULL);
 	if(hFile == INVALID_HANDLE_VALUE)	return;	// Error
@@ -243,6 +246,8 @@ void Ash::writeTmpFile(const std::string& filename)
 	// 書き込む
 	DWORD size;
 	::WriteFile(file.get(), dataStr.c_str(), dataStr.size(), &size, NULL);
+
+	std::cout << "Ash::writeTmpFile()\t: complete" << std::endl;
 }
 
 const User& Ash::getUser(int index) const
@@ -313,6 +318,8 @@ void Ash::setSaveData(const SaveData& data)
 
 void Ash::readTmpFile(const std::string& filename)
 {
+	std::cout << "Ash::readTmpFile()\t: reading tmp file" << std::endl;
+
 	// ファイルを開く
 	HANDLE hFile = ::CreateFile(
 			filename.c_str(),
@@ -329,7 +336,7 @@ void Ash::readTmpFile(const std::string& filename)
 	DWORD size = ::GetFileSize(file.get(), NULL);
 	assert(size != -1);
 	std::vector<char> buffer(size + 1, '\0');
-	int readSize;
+	DWORD readSize;
 	::ReadFile(file.get(), buffer.data(), size, &readSize, NULL);
 	buffer.at(size) = '\0';
 
@@ -346,6 +353,8 @@ void Ash::readTmpFile(const std::string& filename)
 	msgOrders_ = *(data.msgOrders);	delete data.msgOrders;
 	prevMsgs_ = *(data.prevMsgs);	delete data.prevMsgs;
 	setLuaVarsData(data.luaVars);
+
+	std::cout << "Ash::readTmpFile()\t: complete" << std::endl;
 }
 
 void Ash::getWLCount(int& winnerCount, int& loserCount) const

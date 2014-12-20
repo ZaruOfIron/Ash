@@ -175,7 +175,7 @@ void LuaControleScript::onName(int index, const std::string& name)
 
 void LuaControleScript::saveTmpFile()
 {
-	ash.writeTmpFile("./tmp");
+	ash_.writeTmpFile("./tmp");
 }
 
 bool LuaControleScript::checkboolean(lua_State *L, int index)
