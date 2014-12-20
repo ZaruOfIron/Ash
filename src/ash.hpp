@@ -36,7 +36,7 @@ private:
 
 	};
 
-	struct SaveData
+	struct UndoData
 	{
 		std::vector<User> *users;
 		int nowMsgOrder;
@@ -53,7 +53,7 @@ private:
 			}
 	};
 
-	struct TmpData
+	struct SaveData
 	{
 		int quizId;
 		std::vector<User> *users;
@@ -88,33 +88,34 @@ public:
 	~Ash();
 
 	// call from main
-	void setTmpFile(const std::string& filename);
 	void setScript(const std::string& filename);
 	void run();
 
 	// call from tool window
-	void writeSaveData(std::ostream& os);
-	void readSaveData(std::istream& is);
-	void undo();
+	void restoreUndoData();
 	void setUserNames(const std::vector<std::string>& names);
 
 	// call from lua controle script
 	void initialize(int answer, int winner, const std::string& title, const std::string& subtitle, int quizId, const User& orgUser);
 	void update(const UserUpdateMessage& msg);
-	void save();
-	void writeTmpFile(const std::string& filename);
+	void storeUndoData();
 
 	const User& getUser(int index) const;
 	bool hasFinished() const;
 
+	void writeUndoData(std::ostream& os);
+	void readUndoData(std::istream& is);
+	void writeSaveData(std::ostream& os);
+	void readSaveData(std::istream& is);
+
 private:
 	void makeLuaVarsData(std::string& data);
 	void setLuaVarsData(const std::string& data);
+	void makeUndoData(UndoData& data);
+	void setUndoData(const UndoData& data);
 	void makeSaveData(SaveData& data);
 	void setSaveData(const SaveData& data);
 	void sendAllPrevMsgs();
-
-	void readTmpFile(const std::string& filename);
 
 	void getWLCount(int& winnerCount, int& loserCount) const;
 	// クイズの終了確認を行う
