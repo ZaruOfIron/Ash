@@ -24,7 +24,7 @@ public:
 	~LuaControleScript();
 	
 	// Call from Ash
-	void initialize();
+	void initialize(bool hasNameEditsEnabled);
 	void getSaveData(std::ostream& os);
 	void restoreSaveData(std::istream& is);
 

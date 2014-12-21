@@ -18,8 +18,8 @@ LRESULT ControleWindow::NameEdit::WndProc(UINT uMsg, WPARAM wParam, LPARAM lPara
 	return WndProcDefault(uMsg, wParam, lParam);
 }
 
-ControleWindow::ControleWindow(LuaControleScript *controler)
-	: controler_(controler), answer_(0)
+ControleWindow::ControleWindow(LuaControleScript *controler, bool hasNameEditsEnabled)
+	: controler_(controler), answer_(0), hasNameEditsEnabled_(hasNameEditsEnabled)
 {}
 
 int ControleWindow::getAnswer() const
@@ -112,7 +112,7 @@ void ControleWindow::OnCreate()
 			WS_CHILD | WS_VISIBLE | WS_TABSTOP | WS_BORDER | ES_LEFT,
 			rect.left, rect.top, rect.Width(), FORM_PART_HEIGHT,
 			GetHwnd(), reinterpret_cast<HMENU>(index << 8), NULL);
-		nameEdits_.back()->EnableWindow(FALSE);
+		if(!hasNameEditsEnabled_)	nameEdits_.back()->EnableWindow(FALSE);
 
 
 		for(int j = 0;j < userForm_.size();j++){

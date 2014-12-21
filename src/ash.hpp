@@ -82,6 +82,7 @@ private:
 	std::vector<int> msgOrders_;
 	std::vector<PrevMsg> prevMsgs_;
 	std::string ashPath_;
+	bool hasNameEditsEnabled_;
 
 public:
 	Ash();

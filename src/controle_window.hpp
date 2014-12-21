@@ -39,6 +39,7 @@ private:
 	std::vector<ButtonData> userForm_, systemForm_;
 	int answer_;
 	std::vector<std::unique_ptr<NameEdit>> nameEdits_;
+	bool hasNameEditsEnabled_;
 
 	enum {
 		FORM_PART_WIDTH = 100,
@@ -51,7 +52,7 @@ private:
 	};
 	
 public:
-	ControleWindow(LuaControleScript *controler);
+	ControleWindow(LuaControleScript *controler, bool hasNameEditsEnabled);
 
 	int getAnswer() const;
 	void setAnswer(int answer);

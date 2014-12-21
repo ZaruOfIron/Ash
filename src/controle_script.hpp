@@ -19,7 +19,7 @@ public:
 	ControleScript(){}
 	virtual ~ControleScript(){}
 
-	virtual void initialize() = 0;
+	virtual void initialize(bool hasNameEditsEnabled) = 0;
 
 	virtual void getSaveData(std::ostream& os) = 0;
 	virtual void restoreSaveData(std::istream& is) = 0;

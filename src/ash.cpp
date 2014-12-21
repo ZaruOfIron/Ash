@@ -3,9 +3,11 @@
 #include "copydata_view.hpp"
 #include "tool_window.hpp"
 #include "resource.h"
+#include <boost/lexical_cast.hpp>
 #include <boost/archive/text_oarchive.hpp>
 #include <boost/archive/text_iarchive.hpp>
 #include <algorithm>
+#include <fstream>
 #include <iostream>
 #include <list>
 #include <utility>
@@ -19,6 +21,10 @@ Ash::Ash()
 	char buf[MAX_PATH];	::GetCurrentDirectory(sizeof(buf), buf);
 	ashPath_ = buf;
 
+	std::ifstream ifs(ashPath_ + "\\config.txt");
+	std::string inp;	std::getline(ifs, inp);
+	hasNameEditsEnabled_ = static_cast<bool>(boost::lexical_cast<int>(inp));
+
 	std::cout << "Ash::Ash()\t: finish construction" << std::endl;
 }
 
@@ -29,7 +35,7 @@ void Ash::setScript(const std::string& filename)
 {
 	controler_.reset(new LuaControleScript(*this, filename));
 	std::cout << "Ash::setScript()\t: " + filename + " is being loaded" << std::endl;
-	controler_->initialize();
+	controler_->initialize(hasNameEditsEnabled_);
 	std::cout << "Ash::setScript()\t: complete loading" << std::endl;
 }
 
