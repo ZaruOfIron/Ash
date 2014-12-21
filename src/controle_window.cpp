@@ -112,6 +112,7 @@ void ControleWindow::OnCreate()
 			WS_CHILD | WS_VISIBLE | WS_TABSTOP | WS_BORDER | ES_LEFT,
 			rect.left, rect.top, rect.Width(), FORM_PART_HEIGHT,
 			GetHwnd(), reinterpret_cast<HMENU>(index << 8), NULL);
+		nameEdits_.back()->EnableWindow(FALSE);
 
 
 		for(int j = 0;j < userForm_.size();j++){
