@@ -81,6 +81,7 @@ private:
 	int nowMsgOrder_;
 	std::vector<int> msgOrders_;
 	std::vector<PrevMsg> prevMsgs_;
+	std::string ashPath_;
 
 public:
 	Ash();

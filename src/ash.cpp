@@ -15,6 +15,10 @@ Ash::Ash()
 	: users_(), controler_(), view_(new CopyDataView("UAUA"))
 {
 	log_.reset(new ToolWindow(*this, ID_DIALOG));
+
+	char buf[MAX_PATH];	::GetCurrentDirectory(sizeof(buf), buf);
+	ashPath_ = buf;
+
 	std::cout << "Ash::Ash()\t: finish construction" << std::endl;
 }
 
@@ -278,7 +282,7 @@ void Ash::readSaveFile(const std::string& filename)
 
 void Ash::saveTmpFile()
 {
-	writeSaveFile("./.ashtmp.asd");
+	writeSaveFile(ashPath_ + "\\.ashtmp.asd");
 }
 
 void Ash::makeLuaVarsData(std::string& data)
