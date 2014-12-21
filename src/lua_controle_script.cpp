@@ -28,11 +28,11 @@ LuaControleScript::~LuaControleScript()
 	thisPtr_ = nullptr;
 }
 
-void LuaControleScript::initialize()
+void LuaControleScript::initialize(bool hasNameEditsEnabled)
 {
 	auto L = lua_.get();
 
-	window_.reset(new ControleWindow(this));
+	window_.reset(new ControleWindow(this, hasNameEditsEnabled));
 
 	// apiÇê›íË
 	static const luaL_Reg ash[] = {

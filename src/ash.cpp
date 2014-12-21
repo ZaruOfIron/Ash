@@ -3,9 +3,11 @@
 #include "copydata_view.hpp"
 #include "tool_window.hpp"
 #include "resource.h"
+#include <boost/lexical_cast.hpp>
 #include <boost/archive/text_oarchive.hpp>
 #include <boost/archive/text_iarchive.hpp>
 #include <algorithm>
+#include <fstream>
 #include <iostream>
 #include <list>
 #include <utility>
@@ -15,6 +17,19 @@ Ash::Ash()
 	: users_(), controler_(), view_(new CopyDataView("UAUA"))
 {
 	log_.reset(new ToolWindow(*this, ID_DIALOG));
+
+	char buf[MAX_PATH];	::GetCurrentDirectory(sizeof(buf), buf);
+	ashPath_ = buf;
+
+	std::ifstream ifs(ashPath_ + "\\config.txt");
+	if(ifs){
+		std::string inp;	std::getline(ifs, inp);
+		hasNameEditsEnabled_ = static_cast<bool>(boost::lexical_cast<int>(inp));
+	}
+	else{
+		hasNameEditsEnabled_ = true;
+	}
+
 	std::cout << "Ash::Ash()\t: finish construction" << std::endl;
 }
 
@@ -25,7 +40,7 @@ void Ash::setScript(const std::string& filename)
 {
 	controler_.reset(new LuaControleScript(*this, filename));
 	std::cout << "Ash::setScript()\t: " + filename + " is being loaded" << std::endl;
-	controler_->initialize();
+	controler_->initialize(hasNameEditsEnabled_);
 	std::cout << "Ash::setScript()\t: complete loading" << std::endl;
 }
 
@@ -45,7 +60,7 @@ void Ash::setUserNames(const std::vector<std::string>& names)
 		auto& user = users_.at(i);
 		user.name = names.at(i);
 		std::cout << "Ash::setUserNames()\t: send UM to " << i << " (" << user.name << ", " << user.correct << ", " << user.wrong << ", " << user.score << ", 1)...   ";
-		view_->sendUserModified(i, user, 1);
+		sendMsgToView(i, user, 1, std::vector<int>());
 		std::cout << "done." << std::endl;
 	}
 	std::cout << "Ash::setUserNames()\t: setting complete" << std::endl;
@@ -77,10 +92,8 @@ void Ash::update(const UserUpdateMessage& msg)
 	if(user.status != User::STATUS::FIGHTER)	// ëŒè€äO
 		return;
 
-	auto& prevMsg = prevMsgs_.at(msg.index);
 	// ïœçXÇµÇƒÇ¢Ç≠
-	int& modIndex = prevMsg.modIndex;
-	modIndex = 0;
+	int modIndex = 0;
 	if(msg.name){
 		user.name = *(msg.name);
 		modIndex |= 1 << 0;
@@ -98,19 +111,10 @@ void Ash::update(const UserUpdateMessage& msg)
 		modIndex |= 1 << 3;
 	}
 
-	std::cout << "Ash::update()\t: send UM to " << msg.index << " (" << user.name << ", " << user.correct << ", " << user.wrong << ", " << user.score << ", " << modIndex << ")...   ";
-	view_->sendUserModified(msg.index, user, modIndex);
-	std::cout << "done." << std::endl;
-
-	prevMsg.user = user;
-
-	// èáî‘Çìoò^Ç∑ÇÈ
-	msgOrders_.at(msg.index) = nowMsgOrder_++;
-
 	int winnerCount, loserCount;
 	getWLCount(winnerCount, loserCount);
 
-	prevMsg.info.clear();
+	std::vector<int> ais;
 	for(int id : msg.info){
 		// èüÇøî≤ÇØ(1)Ç∆îsëﬁ(2)ÇÕãLò^ÇµÇƒÇ®Ç≠
 		int sendId = id;
@@ -131,11 +135,11 @@ void Ash::update(const UserUpdateMessage& msg)
 			else	assert(false);
 		}
 
-		std::cout << "Ash::update()\t: send AI to " << msg.index << " (" << sendId << ")...   ";
-		view_->sendInfo(sendId);
-		std::cout << "done." << std::endl;
-		prevMsg.info.push_back(sendId);
+		ais.push_back(sendId);
 	}
+
+	// send
+	sendMsgToView(msg.index, user, modIndex, ais);
 
 	// èIÇÌÇÍÇŒÅAèIóπèàóùÇçsÇ§
 	if(winnerCount >= winner_){
@@ -146,8 +150,7 @@ void Ash::update(const UserUpdateMessage& msg)
 			user.status = User::STATUS::LOSER;
 
 			std::cout << "Ash::update()\t: send LOSE to " << i << " (" << user.name << ", " << user.correct << ", " << user.wrong << ", " << user.score << ", " << modIndex << ")...   ";
-			view_->sendUserModified(i, user, 0);
-			view_->sendInfo(200);
+			sendMsgToView(i, user, 0, std::vector<int>({200}));
 			std::cout << "done." << std::endl;
 		}
 	}
@@ -159,8 +162,7 @@ void Ash::update(const UserUpdateMessage& msg)
 			user.status = User::STATUS::WINNER;
 
 			std::cout << "Ash::update()\t: send WIN to " << i << " (" << user.name << ", " << user.correct << ", " << user.wrong << ", " << user.score << ", " << modIndex << ")...   ";
-			view_->sendUserModified(i, user, 0);
-			view_->sendInfo(100);
+			sendMsgToView(i, user, 0, std::vector<int>({100}));
 			std::cout << "done." << std::endl;
 		}
 	}
@@ -278,7 +280,30 @@ void Ash::readSaveFile(const std::string& filename)
 
 void Ash::saveTmpFile()
 {
-	writeSaveFile("./.ashtmp.asd");
+	writeSaveFile(ashPath_ + "\\.ashtmp.asd");
+}
+
+void Ash::sendMsgToView(int index, const User& user, int modIndex, const std::vector<int>& ais)
+{
+	auto& prevMsg = prevMsgs_.at(index);
+	prevMsg.user = user;
+	prevMsg.modIndex = modIndex;
+	prevMsg.info = ais;
+
+	msgOrders_.at(index) = nowMsgOrder_++;
+
+	std::cout << "Ash::sendMsgToView()\t: sending info to " << index << std::endl;
+	std::cout << "Ash::sendMsgToView()\t: UM: (" << index << ", " << user.name << ", " << user.correct << ", " << user.wrong << ", " << user.score << ", " << modIndex << ")" << std::endl;
+	view_->sendUserModified(index, user, modIndex);
+	if(ais.size()){
+		std::cout << "Ash::sendMsgToView()\t: AI: ";
+		for(int ai : ais){
+			view_->sendInfo(ai);
+			std::cout << " ";
+		}
+	}
+	std::cout << std::endl
+		<< "Ash::sendMsgToView()\t: complete" << std::endl;
 }
 
 void Ash::makeLuaVarsData(std::string& data)

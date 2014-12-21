@@ -81,6 +81,8 @@ private:
 	int nowMsgOrder_;
 	std::vector<int> msgOrders_;
 	std::vector<PrevMsg> prevMsgs_;
+	std::string ashPath_;
+	bool hasNameEditsEnabled_;
 
 public:
 	Ash();
@@ -108,6 +110,7 @@ public:
 	void saveTmpFile();
 
 private:
+	void sendMsgToView(int index, const User& user, int modIndex, const std::vector<int>& ais);
 	void makeLuaVarsData(std::string& data);
 	void setLuaVarsData(const std::string& data);
 
