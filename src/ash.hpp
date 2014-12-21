@@ -81,40 +81,44 @@ private:
 	int nowMsgOrder_;
 	std::vector<int> msgOrders_;
 	std::vector<PrevMsg> prevMsgs_;
-	boost::optional<TmpData> tmpData_;
 
 public:
 	Ash();
 	~Ash();
 
-	// call from main
 	void setScript(const std::string& filename);
 	void run();
 
-	// call from tool window
-	void restoreUndoData();
 	void setUserNames(const std::vector<std::string>& names);
 
-	// call from lua controle script
 	void initialize(int answer, int winner, const std::string& title, const std::string& subtitle, int quizId, const User& orgUser);
 	void update(const UserUpdateMessage& msg);
-	void storeUndoData();
 
 	const User& getUser(int index) const;
 	bool hasFinished() const;
 
-	void writeUndoData(std::ostream& os);
-	void readUndoData(std::istream& is);
+	void storeUndoData();
+	void restoreUndoData();
+
 	void writeSaveData(std::ostream& os);
 	void readSaveData(std::istream& is);
+	void writeSaveFile(const std::string& filename);
+	void readSaveFile(const std::string& filename);
+
+	void saveTmpFile();
 
 private:
 	void makeLuaVarsData(std::string& data);
 	void setLuaVarsData(const std::string& data);
+
 	void makeUndoData(UndoData& data);
 	void setUndoData(const UndoData& data);
+	void writeUndoData(std::ostream& os);
+	void readUndoData(std::istream& is);
+
 	void makeSaveData(SaveData& data);
 	void setSaveData(const SaveData& data);
+
 	void sendAllPrevMsgs();
 
 	void getWLCount(int& winnerCount, int& loserCount) const;

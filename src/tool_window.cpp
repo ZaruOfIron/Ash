@@ -59,7 +59,7 @@ BOOL ToolWindow::OnCommand(WPARAM wParam, LPARAM lParam)
 	switch(LOWORD(wParam))
 	{
 	case ID_UNDO:
-		ash_.undo();
+		ash_.restoreUndoData();
 		return TRUE;
 	case ID_SAVEDATA:
 		OnSaveData();

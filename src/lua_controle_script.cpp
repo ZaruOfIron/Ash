@@ -175,7 +175,7 @@ void LuaControleScript::onName(int index, const std::string& name)
 
 void LuaControleScript::saveTmpFile()
 {
-	ash_.writeTmpFile("./ashtmp");
+	ash_.saveTmpFile();
 }
 
 bool LuaControleScript::checkboolean(lua_State *L, int index)
@@ -252,6 +252,6 @@ int LuaControleScript::luaCreateSystemButton(lua_State *L)
 
 int LuaControleScript::luaSave(lua_State *L)
 {
-	thisPtr_->ash_.save();
+	thisPtr_->ash_.storeUndoData();
 }
 
