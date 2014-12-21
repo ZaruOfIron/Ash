@@ -22,8 +22,13 @@ Ash::Ash()
 	ashPath_ = buf;
 
 	std::ifstream ifs(ashPath_ + "\\config.txt");
-	std::string inp;	std::getline(ifs, inp);
-	hasNameEditsEnabled_ = static_cast<bool>(boost::lexical_cast<int>(inp));
+	if(ifs){
+		std::string inp;	std::getline(ifs, inp);
+		hasNameEditsEnabled_ = static_cast<bool>(boost::lexical_cast<int>(inp));
+	}
+	else{
+		hasNameEditsEnabled_ = true;
+	}
 
 	std::cout << "Ash::Ash()\t: finish construction" << std::endl;
 }
@@ -289,6 +294,29 @@ void Ash::readSaveFile(const std::string& filename)
 void Ash::saveTmpFile()
 {
 	writeSaveFile(ashPath_ + "\\.ashtmp.asd");
+}
+
+void Ash::sendInfoToView(int index, const User& user, int modIndex, const std::vector<int>& ais)
+{
+	auto& prevMsg = prevMsgs_.at(index);
+	prevMsg.user = user;
+	prevMsg.modIndex = modIndex;
+	prevMsg.info = info;
+
+	msgOrders_.at(index) = nowMsgOrder_++;
+
+	std::cout << "Ash::sendInfoToView()\t: sending info to " << index << std::endl;
+	std::cout << "Ash::sendInfoToView()\t: UM: " << index << ", " << user.name << ", " << user.correct << ", " << user.wrong << ", " << user.score << ", " << modIndex << std::endl;
+	view_->sendUserModified(index, user, modIndex);
+	if(ais.size()){
+		std::cout << "Ash::sendInfoToView()\t: AI: ";
+		for(int ai : ais){
+			view_->sendInfo(ai);
+			std::cout << " ";
+		}
+	}
+	std::cout << std::endl
+		<< "Ash::sendInfoToView()\t: complete" << std::endl;
 }
 
 void Ash::makeLuaVarsData(std::string& data)

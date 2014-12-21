@@ -110,6 +110,7 @@ public:
 	void saveTmpFile();
 
 private:
+	void sendInfoToView(int index, const User& user, int modIndex, const std::vector<int>& ais);
 	void makeLuaVarsData(std::string& data);
 	void setLuaVarsData(const std::string& data);
 
